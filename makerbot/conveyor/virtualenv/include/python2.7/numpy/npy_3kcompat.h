@@ -1,0 +1,1 @@
+link /usr/share/pyshared/numpy/core/include/numpy/npy_3kcompat.h
