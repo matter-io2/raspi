@@ -1,0 +1,56 @@
+#! /bin/sh
+# postinst for conveyor
+
+# Conveyor runs as a daemon as its own system user. This script sets up that user
+# and creates and sets permissions for the lock file directory.
+
+# This script cribbed heavily from the postinst script used in
+# the "whoopsie" package, which I'm sure has it's own hoary
+# history.
+
+set -e
+
+if [ "$1" = configure ]; then
+		if ! getent passwd conveyor >/dev/null; then
+			adduser --disabled-password --quiet --system \
+				--home /nonexistent --no-create-home --group conveyor \
+				--shell /bin/false
+			adduser conveyor plugdev
+			adduser conveyor dialout
+		fi
+		# Create and set permissions for /var/run/conveyor
+		mkdir -p -m 3777 /var/run/conveyor
+		chmod g+s /var/run/conveyor
+		chgrp conveyor /var/run/conveyor
+		# Set proper permissions for any existing lock files
+		chgrp conveyor /var/run/conveyor/* >/dev/null 2>&1 || true
+		chown conveyor /var/run/conveyor/* >/dev/null 2>&1 || true
+		chmod 0644 /var/run/conveyor/* >/dev/null 2>&1 || true
+
+		# Create and set permissions for /var/log/conveyor
+		mkdir -p -m 3777 /var/log/conveyor
+		chmod g+w /var/log/conveyor
+		chgrp conveyor /var/log/conveyor
+		# Set proper permissions for any existing log files
+		chgrp conveyor /var/log/conveyor/* >/dev/null 2>&1 || true
+		chown conveyor /var/log/conveyor/* >/dev/null 2>&1 || true
+		chmod 0664 /var/log/conveyor/* >/dev/null 2>&1 || true
+
+		# Here's the part where actual, experienced package maintainers will squirm
+		# and call me names. We're putting all our python in a virtualenv.
+		# Squirming experienced package maintainers: I would love to hear your insight.
+		# Drop us a line.
+
+		# Build virtualenv
+		OLDDIR=$PWD
+		cd /usr/share/makerbot/
+		python2.7 ./setup_conveyor_env.py ./python
+		cd $OLDDIR
+		chgrp -R conveyor /usr/share/makerbot/virtualenv
+fi
+
+#DEBHELPER#
+
+/sbin/start conveyor || echo "Upstart failed; please consider starting Conveyor manually."
+
+exit 0

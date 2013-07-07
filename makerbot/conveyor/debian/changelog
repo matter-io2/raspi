@@ -1,0 +1,34 @@
+conveyor (2.0.1) precise; urgency=low
+
+  * Fixed custom profiles (by rewriting recipe.py).
+
+ -- MakerBot Industries dev team <dev@makerbot.com>  Tue, 12 Mar 2013 11:29:56  -0400
+
+conveyor (2.0.0) precise; urgency=low
+
+  * Bugfix: Less likely to break your system
+  * Bugfix: Formatting of changelog 
+  * Feature: Debian package
+
+ -- MakerBot Industries dev team <dev@makerbot.com>  Fri, 15 Feb 2013 17:55:20  -0400
+
+conveyor (1.0.1) precise; urgency=low
+
+  * Bugfixes for makerware release 1.0.1
+  * Support for choosing extruder
+  * Fix for cooling fan with raft
+
+ -- MakerBot Industries dev team <dev@makerbot.com>  Fri, 12 Oct 2012 10:27:20  -0400
+
+conveyor (1.00-0) precise; urgency=low
+
+  * Initial release of MakerWare
+  * Implements future
+
+ -- MakerBot Industries dev team <dev@makerbot.com>  Tue, 19 Sep 2012 10:30:00 -0400
+
+conveyor (0.1-1) precise; urgency=low
+
+  * Initial release
+
+ -- MakerBot Industries dev team <dev@makerbot.com>  Mon, 30 Jul 2012 13:37:23 -0400

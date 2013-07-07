@@ -1,0 +1,13 @@
+*,cover
+*.log
+*.pyc
+*~
+.*.sw?
+.sconsign.dblite
+/.coverage
+/conveyord.lock
+/conveyord.log
+/conveyord.pid
+/conveyord.socket
+/obj
+/virtualenv

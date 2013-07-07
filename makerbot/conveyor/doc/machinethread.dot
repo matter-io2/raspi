@@ -1,0 +1,27 @@
+digraph
+{
+	// States
+
+	"start" [shape="point"];
+	"disconnected";
+	"busy";
+	"idle";
+	"paused";
+	"operation";
+
+	// Transitions
+
+	"start"        -> "disconnected";
+	"disconnected" -> "busy"         [label="connect"];
+	"busy"         -> "disconnected" [label="disconnect\ndisconnected"];
+	"busy"         -> "idle"         [label="went-idle"];
+	"idle"         -> "disconnected" [label="disconnect\ndisconnected"];
+	"idle"         -> "busy"         [label="went-busy"];
+	"idle"         -> "operation"    [label="start-operation"];
+	"operation"    -> "disconnected" [label="disconnect\ndisconnected"];
+	"operation"    -> "busy"         [label="went-busy\noperation-stopped"];
+	"operation"    -> "paused"       [label="pause-operation"];
+	"paused"       -> "disconnected" [label="disconnect\ndisconnected"];
+	"paused"       -> "busy"         [label="went-busy\noperation-stopped"];
+	"paused"       -> "operation"    [label="unpause-operation"];
+}
