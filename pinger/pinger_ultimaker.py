@@ -320,7 +320,7 @@ def findPrinter_and_Ip():
 		#makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
 		# print '!!new printerId', printer_printerId
 		port = '/dev/ttyACM0'#defines port name for arduino
-		pron.do_connect(port)#port not needed? it should scan for an open port
+		pron.p.connect(port)#port not needed? it should scan for an open port
 		printer_printerId = pron.p.printer #get id from printcore
 		print printer_printerId
 
