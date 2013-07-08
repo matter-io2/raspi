@@ -8,6 +8,8 @@
 # - create or generate a unique id for arduino
 # - 
 # - 
+import sys
+sys.path.insert(0, '../Printrun')
 
 from cookielib import CookieJar
 from twisted.internet import reactor,task,endpoints
@@ -30,6 +32,7 @@ from twisted.web.iweb import IBodyProducer
 
 #import Printrun Stuff
 import printcore
+import pronsole
 from printrun.printrun_utils import install_locale
 from printrun import gcoder
 install_locale('pronterface')
