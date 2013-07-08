@@ -321,6 +321,7 @@ def findPrinter_and_Ip():
 		# print '!!new printerId', printer_printerId
 		port = '/dev/ttyACM0'#defines port name for arduino
 		pron.do_connect(port)#port not needed? it should scan for an open port
+		printer_printerId = pron.p.printer #get id from printcore
 
 #DREW-end
 
