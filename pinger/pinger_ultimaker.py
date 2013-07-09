@@ -323,18 +323,19 @@ def findPrinter_and_Ip():
 		# print '!!new printerId', printer_printerId
 		port = '/dev/ttyACM1'#defines port name for arduino
 		#^need to stop pi from locking port in /var/lock/LCK..ttyACM0
+		#gets locked everytime program is stopped w/'control z'
 		baud = '115200'
 		#thread.start_new_thread(pron.do_connect, (port,))#run it in a seperate thread
 		pron.p.connect(port, baud)
 		while True:
 			line=pron.p._readline()#reads output from printer, returns by line
 			#^need to parse
-			if line == None:
-				break
-			if line.find('Echo: External',0,len(line)) != -1:
-				(before,sep,after)=line.partition('-')
-				(b,s,a)=after.partition(' ')
-				printer_printerId = b
+			if (line == None) or (line == ''):
+#				break
+#			if line.find('Echo: External',0,len(line)) != -1:
+#				(before,sep,after)=line.partition('-')
+#				(b,s,a)=after.partition(' ')
+#				printer_printerId = b
 			print (line)
 
 		printer_printerId="test"
