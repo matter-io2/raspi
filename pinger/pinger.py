@@ -297,7 +297,9 @@ def webcam_pic():
 	print '\n\n\n --------starting webcam upload-------- \n\n\n'
 	arg = ['bash','/home/pi/raspi/pinger/webcam_routine.sh']
 	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+	print 'called p = subprocess'
 	data = p.communicate()
+	print 'p.communicate is done'
 	print 'output from http POST of webcam jpg'
 	print data
 	print '\n\n\n --------end of webcam upload-------- \n\n\n'
