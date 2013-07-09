@@ -1,4 +1,4 @@
-#!/home/pi/makerbot/conveyor/virtualenv/bin/python
+#!/home/pi/raspi/makerbot/conveyor/virtualenv/bin/python
 # EASY-INSTALL-SCRIPT: 'unittest2==0.5.1','unit2.py'
 __requires__ = 'unittest2==0.5.1'
 import pkg_resources

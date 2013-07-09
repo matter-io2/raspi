@@ -1,1 +1,1 @@
-link /usr/lib/python2.7/types.py
+/usr/lib/python2.7/types.py
