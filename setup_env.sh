@@ -12,6 +12,7 @@ sudo ./setup.sh  #installs a bunch of dependencies
 . virtualenv/bin/activate #activates virtualenv --both server and client need to be run in virtualenv
 
 #test virtualenv by starting background service
+rm conveyord.socket conveyord.pid conveyord.avail.lock
 python conveyor_service.py -c conveyor-raspi.conf
 
 echo 'conveyord.log output!!'
