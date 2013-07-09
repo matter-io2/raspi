@@ -321,7 +321,7 @@ def findPrinter_and_Ip():
 		#makeCmdlineReq('hello')  # handshake!  
 		#makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
 		# print '!!new printerId', printer_printerId
-		port = '/dev/ttyACM0'#defines port name for arduino
+		port = '/dev/ttyACM1'#defines port name for arduino
 		#^need to stop pi from locking port in /var/lock/LCK..ttyACM0
 		#gets locked everytime program is stopped w/'control z'
 		baud = '115200'
