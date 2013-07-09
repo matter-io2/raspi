@@ -328,7 +328,8 @@ def findPrinter_and_Ip():
 		while True:
 			line=pron.p._readline()#reads output from printer, returns by line
 			#^need to parse
-			if line == None: 
+			if line == None:
+				break
 			if line.find('Echo: External',0,len(find)) != -1:
 				(before,sep,after)=line.partition('-')
 				(b,s,a)=after.partition(' ')
