@@ -322,10 +322,10 @@ def findPrinter_and_Ip():
 		#makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
 		# print '!!new printerId', printer_printerId
 		port = '/dev/ttyACM0'#defines port name for arduino
-		pron.p.connect(port)#connecting through printcore to prevent blocking
-		printer_printerId = pron.p.printer #get id from printcore
+		thread.start_new_thread(pron.do_connect, (port, port))#run it in a seperate thread
+		printer_printerId = str(pron.p.printer) #get id from printcore
 		#^does't work, need to find real ID
-		print "printer_printerId: "+str(printer_printerId)
+		print "!!new printerId", printer_printerId
 
 #DREW-end
 
