@@ -15,7 +15,6 @@ local.properties
 .classpath
 .settings/
 .loadpath
-
 # External tool builders
 .externalToolBuilders/
 
@@ -199,7 +198,9 @@ parts/
 var/
 sdist/
 develop-eggs/
+virtualenv/
 .installed.cfg
+
 
 # Installer logs
 pip-log.txt
