@@ -323,7 +323,7 @@ def findPrinter_and_Ip():
 		pron.p.connect(port)#connecting through printcore to prevent blocking
 		printer_printerId = pron.p.printer #get id from printcore
 		#^does't work, need to find real ID
-		print "printer_printerId: "+printer_printerId
+		print "printer_printerId: "+str(printer_printerId)
 
 #DREW-end
 
