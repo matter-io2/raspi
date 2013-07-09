@@ -336,7 +336,7 @@ def findPrinter_and_Ip():
 			if line.find('Echo: External',0,len(line)) != -1:
 				(before,sep,after)=line.partition('-')
 				(b,s,a)=after.partition(' ')
-				printer_printerId = 
+				printer_printerId = b
 				break
 			elif ((line != None) and (line != '')):#if its connected
 				printer_printerId = "Batman"
