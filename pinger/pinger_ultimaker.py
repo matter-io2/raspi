@@ -325,7 +325,7 @@ def findPrinter_and_Ip():
 		#^need to stop pi from locking port in /var/lock/LCK..ttyACM0
 		#gets locked everytime program is stopped w/'control z'
 		baud = '115200'
-		thread.start_new_thread(pron.do_connect, (baud,))#run it in a seperate thread
+		thread.start_new_thread(pron.do_connect, (port,))#run it in a seperate thread
 		#pron.p.connect(port, baud)
 		while True:
 			line=pron.p._readline()#reads output from printer, returns by line
