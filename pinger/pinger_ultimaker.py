@@ -333,6 +333,7 @@ def findPrinter_and_Ip():
 			#^need to parse
 			if (line == None) or (line == ''):
 				break
+			print (line)
 			if line.find('Echo: External',0,len(line)) != -1:
 				(before,sep,after)=line.partition('-')
 				(b,s,a)=after.partition(' ')
@@ -341,7 +342,7 @@ def findPrinter_and_Ip():
 			elif line.find('ok',0,len(line))>=0:#if its connected
 				printer_printerId = "Batman"
 				print "The Printer has no ID, it's a phantom of the night"
-			print (line)
+				break
 
 		print "!!new printerId", printer_printerId
 
