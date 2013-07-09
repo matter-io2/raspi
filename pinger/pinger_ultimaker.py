@@ -338,7 +338,7 @@ def findPrinter_and_Ip():
 				(b,s,a)=after.partition(' ')
 				printer_printerId = b
 				break
-			elif line.find('ok',0,len(line)):#if its connected
+			elif line.find('ok',0,len(line))>=0:#if its connected
 				printer_printerId = "Batman"
 				print "The Printer has no ID, it's a phantom of the night"
 			print (line)
