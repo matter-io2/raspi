@@ -341,7 +341,6 @@ def findPrinter_and_Ip():
 			elif ((line != None) and (line != '')):#if its connected
 				printer_printerId = "Batman"
 				print "The Printer has no ID, it's a phantom of the night"
-				break
 			print (line)
 
 		print "!!new printerId", printer_printerId
