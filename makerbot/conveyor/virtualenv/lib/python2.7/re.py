@@ -1,1 +1,1 @@
-link /usr/lib/python2.7/re.py
+/usr/lib/python2.7/re.py
