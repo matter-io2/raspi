@@ -5,6 +5,11 @@ cd /home/pi/raspi
 cd piConfig
 chmod +x startup.sh startup_verbose.sh
 
+# cd makerbot/conveyor/submodule/conveyor_bins/python
+# sudo easy_install pyserial-2.7_mb2.1-py2.7.egg
+
+
+
 cd ../makerbot/conveyor
 rm -rf virtualenv
 python virtualenv.py virtualenv #sets up virtualenv folder
