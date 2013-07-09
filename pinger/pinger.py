@@ -292,6 +292,16 @@ def findPrinter_and_Ip():
 	if ip_address == '':
 		get_ipaddress()
 
+def webcam_pic():
+	global printer_printerId
+	print '\n\n\n --------starting webcam upload-------- \n\n\n'
+	arg = ['bash','/home/pi/raspi/pinger/webcam_routine.sh']
+	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+	data = p.communicate()
+	print 'output from http POST of webcam jpg'
+	print data
+	print '\n\n\n --------end of webcam upload-------- \n\n\n'
+
 def print500Response(bodyString):
 	print bodyString
 
@@ -587,6 +597,8 @@ if __name__ == '__main__':
 	print 'Reactor Started'
 	f = task.LoopingCall(findPrinter_and_Ip)
 	f.start(5)
+	g = task.LoopingCall(webcam_pic) #takes image and uploads it
+	g.start(15)
 
 	#jsonDebug
 	#turn this OFF to disable passive listening
