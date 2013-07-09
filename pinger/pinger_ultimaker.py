@@ -323,8 +323,8 @@ def findPrinter_and_Ip():
 		# print '!!new printerId', printer_printerId
 		port = '/dev/ttyACM0'#defines port name for arduino
 		cnnt=thread.start_new_thread(pron.do_connect, (port,))#run it in a seperate thread
-		printer_printerId = str(cnnt.pron.p.printer) #get id from printcore
-		#^does't work, need to find real ID
+		printer_printerId = str(cnnt) #returns connection thread ID
+		#^not real printer ID
 		print "!!new printerId", printer_printerId
 
 #DREW-end
