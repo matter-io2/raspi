@@ -326,6 +326,7 @@ def findPrinter_and_Ip():
 		pron.do_connect(port)
 		#printer_printerId = str(cnnt) #returns connection thread ID
 		#^not real printer ID
+		printer_printerId="test"
 		print "!!new printerId", printer_printerId
 
 #DREW-end
