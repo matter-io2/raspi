@@ -45,6 +45,8 @@ from threading import Thread
 
 #define pronsole
 pron=pronsole.pronsole()
+#define printcore
+pron.p=printcore.printcore()
 
 #globals for drew to manipulate
 printer_profile = 0 # type of machine
