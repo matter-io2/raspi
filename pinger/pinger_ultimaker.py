@@ -333,13 +333,12 @@ def findPrinter_and_Ip():
 			#^need to parse
 			if (line == None) or (line == ''):
 				break
-#			if line.find('Echo: External',0,len(line)) != -1:
-#				(before,sep,after)=line.partition('-')
-#				(b,s,a)=after.partition(' ')
-#				printer_printerId = b
+			if line.find('Echo: External',0,len(line)) != -1:
+				(before,sep,after)=line.partition('-')
+				(b,s,a)=after.partition(' ')
+				printer_printerId = b
 			print (line)
 
-		printer_printerId="test"
 		print "!!new printerId", printer_printerId
 
 #DREW-end
