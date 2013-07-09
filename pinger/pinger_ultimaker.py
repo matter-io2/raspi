@@ -323,9 +323,12 @@ def findPrinter_and_Ip():
 		# print '!!new printerId', printer_printerId
 		port = '/dev/ttyACM0'#defines port name for arduino
 		#cnnt=thread.start_new_thread(pron.do_connect, (port,))#run it in a seperate thread
-		pron.do_connect(port)
-		#printer_printerId = str(cnnt) #returns connection thread ID
-		#^not real printer ID
+		pron.p.connect(port)
+		while True:
+			line=pron.p._readline()#reads output from printer, returns by line
+			#^need to parse
+			if line == None: break
+			print (line)
 		printer_printerId="test"
 		print "!!new printerId", printer_printerId
 
