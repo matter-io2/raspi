@@ -295,9 +295,9 @@ def findPrinter_and_Ip():
 def webcam_pic():
 	global printer_printerId
 	print '\n\n\n --------starting webcam upload-------- \n\n\n'
-	
+	print printer_printerId
 	arg = ['/home/pi/raspi/pinger/webcam_routine.sh',str(printer_printerId)]
-	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+	p=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 	print 'called p = subprocess'
 	data = p.communicate()
 	print 'p.communicate is done'
