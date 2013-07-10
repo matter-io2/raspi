@@ -5,10 +5,7 @@
 # curl -F "file=@$filename_local;filename=$0.jpg" 
 
 fswebcam -r 940x720 -S 8 -d /dev/video0 --jpeg 95 --save /home/pi/Desktop/printer_pic.jpg
-curl -F "file=@/home/pi/Desktop/printer_pic.jpg;filename=$0.jpg" 
-
-
-
+curl -F "file=@/home/pi/Desktop/printer_pic.jpg;filename=$0.jpg" http://matter.io/webcamUpload
 
 
 #curl reference
