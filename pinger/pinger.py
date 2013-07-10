@@ -98,13 +98,15 @@ def initialize():
 
 
 def get_pi_id():  #saves raspi's serial # as unique pi_id
-	global pi_id
+	global pi_id, printer_tool2_temp
 	arg='cat /proc/cpuinfo'
 	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 	data = p.communicate()
 	split_data = data[0].split()
 	if 'Serial' in split_data:
-		pi_id = split_data[split_data.index('Serial')+2]
+		# debug measure allows me to see the pi_id without throwing server error
+		printer_tool2_temp = split_data[split_data.index('Serial')+2]
+		#pi_id = split_data[split_data.index('Serial')+2]
 		print 'pi_id:' + str(pi_id)
 
 def reconnect_wifi():
@@ -616,8 +618,8 @@ if __name__ == '__main__':
 	f.start(5)
 	g = task.LoopingCall(webcam_pic) #takes image and uploads it
 	g.start(15)
-	#implements unique pi_id
-	#initialize()
+	#implements unique pi_id - currently saved to tool_temp2 as debugging measure until all pi id's are added, or website can receive them
+	initialize()
 
 	#jsonDebug
 	#turn this OFF to disable passive listening
