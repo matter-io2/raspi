@@ -93,6 +93,22 @@ def get_ipaddress():
 		ip_address = ''
 		reconnect_wifi()
 
+def initialize():
+	get_pi_id()
+
+
+def get_pi_id():  #saves raspi's serial # as unique pi_id
+	global pi_id, printer_tool2_temp
+	arg='cat /proc/cpuinfo'
+	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+	data = p.communicate()
+	split_data = data[0].split()
+	if 'Serial' in split_data:
+		# debug measure allows me to see the pi_id without throwing server error
+		printer_tool2_temp = split_data[split_data.index('Serial')+2]
+		#pi_id = split_data[split_data.index('Serial')+2]
+		print 'pi_id:' + str(pi_id)
+
 def reconnect_wifi():
 		print 'starting bash script to reconnect to wifi'
 		arg = ['bash','/home/pi/raspi/piConfig/find_network_hot.sh']
@@ -292,6 +308,19 @@ def findPrinter_and_Ip():
 	# if ip_address == '' and not printer_inUse:
 	if ip_address == '':
 		get_ipaddress()
+
+def webcam_pic():
+	global printer_printerId
+	print '\n\n\n --------starting webcam upload-------- \n\n\n'
+	print printer_printerId
+	arg = ['/home/pi/raspi/pinger/webcam_routine.sh',str(printer_printerId)]
+	p=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
+	print 'called p = subprocess'
+	data = p.communicate()
+	print 'p.communicate is done'
+	print 'output from http POST of webcam jpg'
+	print data
+	print '\n\n\n --------end of webcam upload-------- \n\n\n'
 
 def print500Response(bodyString):
 	print bodyString
@@ -588,6 +617,10 @@ if __name__ == '__main__':
 	print 'Reactor Started'
 	f = task.LoopingCall(findPrinter_and_Ip)
 	f.start(5)
+	g = task.LoopingCall(webcam_pic) #takes image and uploads it
+	g.start(15)
+	#implements unique pi_id - currently saved to tool_temp2 as debugging measure until all pi id's are added, or website can receive them
+	#initialize()
 
 	#jsonDebug
 	#turn this OFF to disable passive listening
