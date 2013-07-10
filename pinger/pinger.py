@@ -28,7 +28,7 @@ printer_tool2_temp = -1
 printer_bed_temp = -1
 online = False # 'CONNECTED', 'DISCONNECTED'
 
-pi_id = ''
+pi_id = 'ASDF1234'
 
 job_id = ''
 job_filename = ''
@@ -619,7 +619,7 @@ if __name__ == '__main__':
 	g = task.LoopingCall(webcam_pic) #takes image and uploads it
 	g.start(15)
 	#implements unique pi_id - currently saved to tool_temp2 as debugging measure until all pi id's are added, or website can receive them
-	initialize()
+	#initialize()
 
 	#jsonDebug
 	#turn this OFF to disable passive listening
