@@ -12,7 +12,7 @@ virtualenv/bin/python conveyor_service.py -c conveyor-debian.conf
 #run these from commandline, comment out here when debugging
 cd /home/pi/raspi/pinger/
 #nohup python pinger.py & # doesn't work with read only
-nohup python pinger.py >/dev/null 2>&1   # doesn't create nohup.out
+nohup python pinger.py &   # doesn't create nohup.out
 #python pinger.py  # this version has output vs. nohup which doesn't
 
 #cd ../../Desktop/GPIO_testing/
