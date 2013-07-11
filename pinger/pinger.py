@@ -314,7 +314,7 @@ def findPrinter_and_Ip():
 		get_ipaddress()
 
 def webcam_pic():
-	global printer_printerId, pi_id, pic_count
+	global printer_printerId, pi_id, pic_count, server
 	print '\n\n\n --------starting webcam upload-------- \n\n\n'
 	print 'printer id = ',printer_printerId
 	address = server+'webcamUpload'
