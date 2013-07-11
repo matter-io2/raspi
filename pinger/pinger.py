@@ -17,6 +17,8 @@ from zope.interface import implements
 from twisted.internet.defer import succeed
 from twisted.web.iweb import IBodyProducer
 
+#server = 'http://matter.io/'
+server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 lost_packets = 0
 pic_count = 0
 
@@ -105,10 +107,11 @@ def get_pi_id():  #saves raspi's serial # as unique pi_id
 	data = p.communicate()
 	split_data = data[0].split()
 	if 'Serial' in split_data:
-		# debug measure allows me to see the pi_id without throwing server error
-		#printer_tool2_temp = split_data[split_data.index('Serial')+2]
 		pi_id = split_data[split_data.index('Serial')+2]
 		print '\npi_id:' + str(pi_id) + '\n'
+
+	print 'using old pi id until the server accepts unique pi_idz'
+	pi_id = 'ASDF1234'
 
 def reconnect_wifi():
 		print 'starting bash script to reconnect to wifi'
@@ -130,7 +133,9 @@ def makeRequest(status):
 	global job_num, job_process, job_progress, job_conclusion
 	global pi_id
 	global lost_packets
-	
+	global server
+	address = server+'printerPing/'	
+	print 'upload address = ',address
 # debugger that shows what is being posted to the server (see agent.request for actual posting)	
 	print 'Data Sent:',urllib.urlencode({'type':'update',
 														'online':online,
@@ -152,7 +157,7 @@ def makeRequest(status):
 	# print 'Data Sent'
 # posts information to server
 	d = agent.request(	'POST',  
-						'http://matter.io/printerPing/',
+						address,
 						Headers({'Content-Type': ['application/x-www-form-urlencoded']}),
 						StringProducer(urllib.urlencode({'type':'update',
 														'online':online,
@@ -311,15 +316,16 @@ def findPrinter_and_Ip():
 def webcam_pic():
 	global printer_printerId, pi_id, pic_count
 	print '\n\n\n --------starting webcam upload-------- \n\n\n'
-	print printer_printerId
+	print 'printer id = ',printer_printerId
+	address = server+'webcamUpload'
+	print 'address for post', address
 	if printer_printerId == '': #no printerId, use pi_id
 		# arg = ['/home/pi/raspi/pinger/webcam_routine.sh', str(pi_id)]
 		pass # do nothing if there is no printer_id
 	else:
-		arg = ['/home/pi/raspi/pinger/webcam_routine.sh',str(printer_printerId),str(pic_count)]
+		arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count)]
 		p=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 	pic_count = pic_count +1
-	print 'called p = subprocess'
 	print '\n\n\n --------end of webcam upload-------- \n\n\n'
 
 def print500Response(bodyString):
