@@ -1,0 +1,25 @@
+auto lo
+
+iface lo inet loopback
+iface eth0 inet dhcp
+
+allow-hotplug wlan0
+iface wlan0 inet manual
+#wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+#auto wlan0
+
+
+iface wlan0 inet dhcp
+  wpa-driver wext
+  wpa-scan-ssid 1
+  wpa-ap-scan 1
+  wpa-key-mgmt WPA-PSK
+  wpa-proto RSN WPA
+  wpa-pairwise CCMP TKIP
+  wpa-group CCMP TKIP
+  wpa-ssid KLabsGuest
+  wpa-psk CB11B9ACA2
+#  wpa-ssid KLabs
+#  wpa-psk E5D734B43A
+
+iface default inet dhcp
