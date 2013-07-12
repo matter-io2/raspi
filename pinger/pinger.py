@@ -17,8 +17,8 @@ from zope.interface import implements
 from twisted.internet.defer import succeed
 from twisted.web.iweb import IBodyProducer
 
-#server = 'http://matter.io/'
-server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
+server = 'http://matter.io/'
+#server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 lost_packets = 0
 pic_count = 0
 
