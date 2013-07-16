@@ -2,13 +2,32 @@
 #! /bin/sh
 
 #cleanup
-sudo killall python
+#sudo killall python
 
-#update
-sudo mount / -o remount,rw
-cd /home/pi/raspi
-svn update
-sudo mount / -o remount,ro
+#svn update
+#sudo mount / -o remount,rw
+#cd /home/pi/raspi
+#svn update
+#sudo mount / -o remount,ro
+
+git fetch origin
+reslog_working=$(git log HEAD..origin/working_base --oneline)
+reslog_master=$(git log HEAD..origin/master --oneline)
+if [[ "${reslog_working}" != "" ]] ; then
+	sudo killall python
+	git checkout working_base
+	git merge origin/working_base #completing the pull
+	
+fi
+if [[ "${reslog_master}" != ""]] ; then
+	sudo killall python
+	git checkout master
+	git merge origin/master
+fi
+
+
+
+
 #restart conveyor
 # cd /home/pi/raspi/makerbot/conveyor/
 # rm conveyord.socket conveyord.pid conveyord.avail.lock
