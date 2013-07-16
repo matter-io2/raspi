@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # killall python
+echo connection = $1
 while true ; do
-   if ifconfig wlan0 | grep -q "inet addr:" ; then
+   if ifconfig $1 | grep -q "inet addr:" ; then
      # sudo /home/pi/raspi/piConfig/startup_verbose.sh &
      echo "killing bash script"
      exit
@@ -10,7 +11,7 @@ while true ; do
      # sleep 60
    else
       echo "Network connection down! Attempting reconnection."
-      ifup --force wlan0
+      ifup --force $1
       sleep 5
    fi
 
