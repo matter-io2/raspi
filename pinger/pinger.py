@@ -191,18 +191,19 @@ def makeRequest(status):
 	# 					)
 
 	print 'Request Sent' # debug output
-	lost_packets = lost_packets+1
 	print 'lost packet num =', str(lost_packets)
 # queue's up next method	
 	d.addCallback(cbRequest, cookieJar)
 
 	# if lost_packets >= 5 and not printer_inUse:
-	if lost_packets >= 6:
+	if lost_packets > 6:  
 	
 		print 'no response from server - attempting reconnect via bash script now'
 		print '(>=6 packets missed, 30 seconds without connection)'
 		lost_packets=0
 		reconnect_wifi()
+	# assume packet is lost unless you get a response in cbRequest()
+	lost_packets = lost_packets+1
 
 
 #data sent back from server
@@ -237,9 +238,9 @@ def parseJSON(bodyString):
 	print bodyDict
 	# this is the Json packet from the server
 	job_cancel = False
-	if bodyDict.has_key('job_id'):  
+	if bodyDict.has_key('job_id'):
 	# this is the 
-		if bodyDict['job_id'] == job_id: 
+		if bodyDict['job_id'] == job_id:
 		# job_ids match!
 			if bodyDict.has_key('job_cancelCmd') and bodyDict['job_cancelCmd'] == True and printer_inUse:
 				job_cancel = True
