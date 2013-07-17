@@ -300,7 +300,6 @@ def printFile(fileName):
 #DREW-start
 # print command goes here
 
-	filename = '/home/pi/Printrun/Small_buddha.gcode'
 	#reprap print function here
 	gcode = [i.strip() for i in open(filename)]#sends gcode line by line
 	gcode = gcoder.GCode(gcode)
@@ -339,19 +338,16 @@ def findPrinter_and_Ip():
 				(b,s,a)=after.partition(' ')
 				printer_printerId = b
 				online = True
-				printFile('/home/pi/Printrun/Small_buddha.gcode')
 				break
 			elif line.find('Printer is now online',0,len(line))>=0:#if its connected
 				printer_printerId = "Batman"
 				print "The Printer has no ID, it's a phantom of the night"
 				online = True
-				printFile('/home/pi/Printrun/Small_buddha.gcode')
 				break
 			elif line.find('ok',0,len(line))>=0:#if its connected
 				printer_printerId = "Batman"
 				print "The Printer has no ID, it's a phantom of the night"
 				online = True
-				printFile('/home/pi/Printrun/Small_buddha.gcode')
 				break
 
 		print "!!new printerId", printer_printerId
