@@ -6,7 +6,7 @@ cd /home/pi
 
 killall python
 cd /home/pi/raspi/makerbot/conveyor/
-rm conveyord.socket conveyord.pid conveyord.avail.lock
+rm conveyord.socket conveyord.pid conveyord.avail.lock conveyord.log
 virtualenv/bin/python conveyor_service.py -c conveyor-debian.conf
 echo -e '\n ---------conveyord.log (tail 20)----------'
 tail conveyord.log -n 20

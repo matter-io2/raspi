@@ -10,20 +10,28 @@
 #svn update
 #sudo mount / -o remount,ro
 
-git fetch origin
+echo "trying to fetch"
+sudo -u pi git fetch origin
+echo "fetch finished"
 reslog_working=$(git log HEAD..origin/working_base --oneline)
 reslog_master=$(git log HEAD..origin/master --oneline)
-if [[ "${reslog_working}" != "" ]] ; then
+if [ "${reslog_working}" != "" ] ; then
+	echo 'updating working_base branch'
 	sudo killall python
 	git checkout working_base
 	git merge origin/working_base #completing the pull
-	
+else
+	echo '"working_base" branch already up-to-date'
 fi
-if [[ "${reslog_master}" != ""]] ; then
+if [ "${reslog_master}" != "" ] ; then
+	echo 'updating master branch'
 	sudo killall python
 	git checkout master
 	git merge origin/master
+else
+	echo '"master" branch already up-to-date'
 fi
+
 
 
 
