@@ -14,7 +14,7 @@ echo "trying to fetch"
 sudo -u pi git fetch origin
 echo "fetch finished"
 reslog_working=$(git log HEAD..origin/working_base --oneline)
-reslog_master=$(git log HEAD..origin/master --oneline)
+reslog_dev=$(git log HEAD..origin/dev --oneline)
 if [ "${reslog_working}" != "" ] ; then
 	echo 'updating working_base branch'
 	sudo killall python
@@ -23,13 +23,13 @@ if [ "${reslog_working}" != "" ] ; then
 else
 	echo '"working_base" branch already up-to-date'
 fi
-if [ "${reslog_master}" != "" ] ; then
+if [ "${reslog_dev}" != "" ] ; then
 	echo 'updating master branch'
 	sudo killall python
-	git checkout master
-	git merge origin/master
+	git checkout dev
+	git merge origin/dev
 else
-	echo '"master" branch already up-to-date'
+	echo '"dev" branch already up-to-date'
 fi
 
 #greg's comment #1
