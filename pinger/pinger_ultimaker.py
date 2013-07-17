@@ -304,6 +304,8 @@ def printFile(fileName):
 	gcode = [i.strip() for i in open(filename)]#sends gcode line by line
 	gcode = gcoder.GCode(gcode)
 	pron.p.startprint(gcode) #calls method in printcore through pronsole only takes arrays
+	#while printing
+	#	line=pron.p._readline()
 
 #DREW- end
 
