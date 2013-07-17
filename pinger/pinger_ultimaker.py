@@ -647,7 +647,7 @@ if __name__ == '__main__':
 	print 'Reactor Started'
 	f = task.LoopingCall(findPrinter_and_Ip)
 	f.start(5)
-	while true:
+	while True:
 		if online:
 			printFile('/home/pi/Printrun/Small_buddha.gcode')
 
