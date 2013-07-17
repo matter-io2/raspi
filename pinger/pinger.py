@@ -82,6 +82,18 @@ class BeginningPrinter(Protocol):
 			print reason.printTraceback()
 
 # From: http://cagewebdev.com/index.php/raspberry-pi-showing-some-system-info-with-a-python-script/
+def findPrinter_and_Ip():
+	global printer_profile, printer_firmware, printer_printerId 
+	if printer_printerId == '':
+		print 'trying to connect to printer...'
+		online == False
+		makeCmdlineReq('hello')  # handshake!  
+		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
+		# print '!!new printerId', printer_printerId
+	# if ip_address == '' and not printer_inUse:
+	if ip_address == '':
+		get_ipaddress()
+
 def get_ipaddress():
 	global ip_address
 	#Returns the current IP address
@@ -98,9 +110,21 @@ def get_ipaddress():
 		ip_address = ''
 		reconnect_wifi()
 
+def reconnect_wifi():
+		global connection
+		print 'starting bash script to reconnect to wifi'
+		arg = ['bash','/home/pi/raspi/piConfig/find_network_hot.sh',str(connection)]
+		p=subprocess.Popen(arg)
+		# p.wait()
+		print 'waiting...'
+		p.wait()
+		print 'wait finished'
+		data2 = p.communicate()
+		print 'printing data from python...\n\n\n'
+		print data2
+
 def initialize():
 	get_pi_id()
-
 
 def get_pi_id():  #saves raspi's serial # as unique pi_id
 	global pi_id
@@ -114,18 +138,6 @@ def get_pi_id():  #saves raspi's serial # as unique pi_id
 
 	print 'using old pi id until the server accepts unique pi_idz'
 	pi_id = 'ASDF1234'
-
-def reconnect_wifi():
-		print 'starting bash script to reconnect to wifi'
-		arg = ['bash','/home/pi/raspi/piConfig/find_network_hot.sh',str(connection)]
-		p=subprocess.Popen(arg)
-		# p.wait()
-		print 'waiting...'
-		p.wait()
-		print 'wait finished'
-		data2 = p.communicate()
-		print 'printing data from python...\n\n\n'
-		print data2
 
 #sends information to the website		
 def makeRequest(status):
@@ -192,18 +204,19 @@ def makeRequest(status):
 
 	print 'Request Sent' # debug output
 	print 'lost packet num =', str(lost_packets)
-# queue's up next method	
+	lost_packets = lost_packets+1
+
+# adds next method to polling
 	d.addCallback(cbRequest, cookieJar)
 
 	# if lost_packets >= 5 and not printer_inUse:
-	if lost_packets > 6:  
+	if lost_packets > 6: # 30 seconds  
 	
 		print 'no response from server - attempting reconnect via bash script now'
 		print '(>=6 packets missed, 30 seconds without connection)'
 		lost_packets=0
 		reconnect_wifi()
 	# assume packet is lost unless you get a response in cbRequest()
-	lost_packets = lost_packets+1
 
 
 #data sent back from server
@@ -303,18 +316,6 @@ def printFile(fileName):
 	#print file in printer.py
 	p.printFile(fileName,slicer)
 #LIGHTS - fLASH GREEN WHEN GOING
-
-def findPrinter_and_Ip():
-	global printer_profile, printer_firmware, printer_printerId 
-	if printer_printerId == '':
-		print 'trying to connect to printer...'
-		online == False
-		makeCmdlineReq('hello')  # handshake!  
-		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
-		# print '!!new printerId', printer_printerId
-	# if ip_address == '' and not printer_inUse:
-	if ip_address == '':
-		get_ipaddress()
 
 def webcam_pic():
 	global printer_printerId, pi_id, pic_count, server
