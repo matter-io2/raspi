@@ -339,16 +339,19 @@ def findPrinter_and_Ip():
 				(b,s,a)=after.partition(' ')
 				printer_printerId = b
 				online = True
+				printFile('/home/pi/Printrun/Small_buddha.gcode')
 				break
 			elif line.find('Printer is now online',0,len(line))>=0:#if its connected
 				printer_printerId = "Batman"
 				print "The Printer has no ID, it's a phantom of the night"
 				online = True
+				printFile('/home/pi/Printrun/Small_buddha.gcode')
 				break
 			elif line.find('ok',0,len(line))>=0:#if its connected
 				printer_printerId = "Batman"
 				print "The Printer has no ID, it's a phantom of the night"
 				online = True
+				printFile('/home/pi/Printrun/Small_buddha.gcode')
 				break
 
 		print "!!new printerId", printer_printerId
@@ -650,9 +653,6 @@ if __name__ == '__main__':
 	print 'Reactor Started'
 	f = task.LoopingCall(findPrinter_and_Ip)
 	f.start(5)
-	while True:
-		if online:
-			printFile('/home/pi/Printrun/Small_buddha.gcode')
 
 	#jsonDebug
 	#turn this OFF to disable passive listening
