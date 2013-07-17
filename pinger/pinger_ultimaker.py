@@ -343,8 +343,7 @@ def findPrinter_and_Ip():
 				online = True
 				break
 			#this will always tell you when it's connected but comes before the possible ID
-			 elif line.find('Printer is now online',0,len(line))>=0:
-			 	#if its connected
+			elif line.find('Printer is now online',0,len(line))>=0:#if its connected
 			 	printer_printerId = "Batman"
 			 	print "The Printer has no ID, it's a phantom of the night"
 			 	online = True
