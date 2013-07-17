@@ -314,7 +314,7 @@ def findPrinter_and_Ip():
 	global printer_profile, printer_firmware, printer_printerId 
 	if printer_printerId == '':
 		print 'trying to connect to printer...'
-		online == False
+		online = False # was ==
 #DREW-start
 # connect to printer
 
