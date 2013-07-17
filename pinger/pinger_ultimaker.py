@@ -338,14 +338,17 @@ def findPrinter_and_Ip():
 				(before,sep,after)=line.partition('-')
 				(b,s,a)=after.partition(' ')
 				printer_printerId = b
+				online = True
 				break
 			elif line.find('Printer is now online',0,len(line))>=0:#if its connected
 				printer_printerId = "Batman"
 				print "The Printer has no ID, it's a phantom of the night"
+				online = True
 				break
 			elif line.find('ok',0,len(line))>=0:#if its connected
 				printer_printerId = "Batman"
 				print "The Printer has no ID, it's a phantom of the night"
+				online = True
 				break
 
 		print "!!new printerId", printer_printerId
