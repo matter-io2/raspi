@@ -20,14 +20,16 @@ if [ "${reslog_working}" != "" ] ; then
 	sudo killall python
 	git checkout working_base
 	git merge origin/working_base #completing the pull
+	echo 'new update on working_base, restart pinger at next stop'>/home/pi/raspi/piConfig/update.log
 else
 	echo '"working_base" branch already up-to-date'
 fi
 if [ "${reslog_dev}" != "" ] ; then
-	echo 'updating master branch'
+	echo 'updating dev branch'
 	sudo killall python
 	git checkout dev
 	git merge origin/dev
+	echo 'new update on dev'>/home/pi/raspi/piConfig/update.log
 else
 	echo '"dev" branch already up-to-date'
 fi

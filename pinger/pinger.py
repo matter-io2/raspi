@@ -45,41 +45,56 @@ job_started = False
 job_fail_msg = ''
 ip_address = ''
 
-# From: http://twistedmatrix.com/documents/current/web/howto/client.html
-class StringProducer(object): 
-	implements(IBodyProducer)
 
-	def __init__(self, body):
-		self.body = body
-		self.length = len(body)
+##main brain services
+# moderate wifi connection
+# talk to server, parse response, dole out tasks
+# identify printer type
+# webcam photos
 
-	def startProducing(self, consumer):
-		consumer.write(self.body)
-		return succeed(None)
 
-	def pauseProducing(self):
-		pass
 
-	def stopProducing(self):
-		pass
-	
 
-# From: http://twistedmatrix.com/documents/current/web/howto/client.html
-class BeginningPrinter(Protocol):
-	def __init__(self, finished,remaining):
-		self.finished = finished
-#		self.remaining = remaining
-		self.display = ''
-	def dataReceived(self, bytes):
-#		if self.remaining:
-			self.display += bytes
-#			self.remaining -= len(bytes[:self.remaining])
+def mainBrain():
+#variables I need - 
+	global server
+	global connection, lost_packets, pic_count
+	global printer_inUse, 
+	global pi_id, online
 
-	def connectionLost(self, reason):
-		if reason.getErrorMessage().startswith('Response body fully received'):
-			self.finished.callback(self.display)
-		else:
-			print reason.printTraceback()
+#----implement--------
+# mainBrain script
+# if wifi lost:   
+# 	reconnect wifi
+# if not connected:
+# 	if lsusb has my printer id...: 
+# 		attempt connect...
+# 	elif lsusb has some other printer id...
+# 		start other printer's pinger script
+# 	else:
+# 		print 'no known printer id's attached
+# if webcam attached
+# 	take webcam photo and post
+#----implement--------
+
+#driver
+# contains all low level commands
+# - connect, print, cancel, monitor
+
+def initialize(): #startup script, only run once at beginning, run here because global variables aren't initialized yet in __main__
+	get_pi_id()
+
+def findPrinter_and_Ip():
+	global printer_profile, printer_firmware, printer_printerId 
+	if printer_printerId == '':
+		print 'trying to connect to printer...'
+		online == False
+		makeCmdlineReq('hello')  # handshake!  
+		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
+		# print '!!new printerId', printer_printerId
+	# if ip_address == '' and not printer_inUse:
+	if ip_address == '':
+		get_ipaddress()
 
 # From: http://cagewebdev.com/index.php/raspberry-pi-showing-some-system-info-with-a-python-script/
 def get_ipaddress():
@@ -97,11 +112,6 @@ def get_ipaddress():
 		print 'no LAN IP address assigned - missing "src" key'
 		ip_address = ''
 		reconnect_wifi()
-
-def initialize():
-	get_pi_id()
-
-
 def get_pi_id():  #saves raspi's serial # as unique pi_id
 	global pi_id
 	arg='cat /proc/cpuinfo'
@@ -116,18 +126,36 @@ def get_pi_id():  #saves raspi's serial # as unique pi_id
 	pi_id = 'ASDF1234'
 
 def reconnect_wifi():
+		global connection
 		print 'starting bash script to reconnect to wifi'
-		arg = ['bash','/home/pi/raspi/piConfig/find_network_hot.sh',str(connection)]
+		arg = ['bash','/home/pi/raspi/piConfig/find_network_hot.sh',str(connection)] # find_network_hot.sh allows pinger to stay active
 		p=subprocess.Popen(arg)
 		# p.wait()
 		print 'waiting...'
-		p.wait()
-		print 'wait finished'
+		p.wait()  # don't do anything until wifi comes back up
+		print 'wait is finished'
 		data2 = p.communicate()
 		print 'printing data from python...\n\n\n'
 		print data2
 
-#sends information to the website		
+def webcam_pic():
+	global printer_printerId, pi_id, pic_count, server
+	print '\n\n\n --------starting webcam upload-------- \n\n\n'
+	print 'printer id = ',printer_printerId
+	address = server+'webcamUpload'
+	print 'address for post', address
+	if printer_printerId == '': #no printerId, use pi_id
+		# arg = ['/home/pi/raspi/pinger/webcam_routine.sh', str(pi_id)]
+		pass # do nothing if there is no printer_id
+	else:
+		arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count)]
+		p=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
+	pic_count = pic_count +1
+	print '\n\n\n --------end of webcam upload-------- \n\n\n'
+
+
+
+#http POST to website - also 
 def makeRequest(status):
 	global printer_profile, printer_firmware, printer_printerId, printer_inUse, online
 	global printer_tool1_temp, printer_tool2_temp, printer_bed_temp
@@ -156,7 +184,6 @@ def makeRequest(status):
 														'job_conclusion':job_conclusion,
 														'job_fail_msg':job_fail_msg,
 														'status':status})
-	# print 'Data Sent'
 # posts information to server
 	d = agent.request(	'POST',  
 						address,
@@ -179,32 +206,21 @@ def makeRequest(status):
 														'job_fail_msg':job_fail_msg,
 														'status':status}))
 					)
-	
-	# d.addCallback(cbRequest, cookieJar)
-	# filename = '/home/pi/webcam/printer.jpg'
-	# body = FileBodyProducer('/home/pi/webcam/printer.jpg')
-	# with open(filename) as imageOut:
-	# 	c = agent.request(	'POST',  
-	# 						'http://matter.io/webcamUpload/',
-	# 						Headers({'Content-Type': ['application/form-data']}),
-	# 						FileBodyProducer(imageOut)
-	# 					)
-
 	print 'Request Sent' # debug output
 	print 'lost packet num =', str(lost_packets)
-# queue's up next method	
+	lost_packets = lost_packets+1
+
+# adds next method to polling
 	d.addCallback(cbRequest, cookieJar)
 
+#this should live in main brain somewhere higher
 	# if lost_packets >= 5 and not printer_inUse:
-	if lost_packets > 6:  
-	
+	if lost_packets > 6: # 30 seconds  
 		print 'no response from server - attempting reconnect via bash script now'
 		print '(>=6 packets missed, 30 seconds without connection)'
 		lost_packets=0
 		reconnect_wifi()
 	# assume packet is lost unless you get a response in cbRequest()
-	lost_packets = lost_packets+1
-
 
 #data sent back from server
 def cbRequest(response, cookieJar):
@@ -278,7 +294,6 @@ def parseJSON(bodyString):
 
 
 import downloader.downloader as dl
-
 def downloadFile(url):
 	global job_filename
 	agent = Agent(reactor)
@@ -290,7 +305,6 @@ def downloadFile(url):
 		d.addCallback(printFile)
 
 import printer.printer as p
-
 def printFile(fileName):
 	print 'In PrintFile',fileName  # shows file path
 	#determine which slicer was used...
@@ -304,35 +318,56 @@ def printFile(fileName):
 	p.printFile(fileName,slicer)
 #LIGHTS - fLASH GREEN WHEN GOING
 
-def findPrinter_and_Ip():
-	global printer_profile, printer_firmware, printer_printerId 
-	if printer_printerId == '':
-		print 'trying to connect to printer...'
-		online == False
-		makeCmdlineReq('hello')  # handshake!  
-		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
-		# print '!!new printerId', printer_printerId
-	# if ip_address == '' and not printer_inUse:
-	if ip_address == '':
-		get_ipaddress()
-
-def webcam_pic():
-	global printer_printerId, pi_id, pic_count, server
-	print '\n\n\n --------starting webcam upload-------- \n\n\n'
-	print 'printer id = ',printer_printerId
-	address = server+'webcamUpload'
-	print 'address for post', address
-	if printer_printerId == '': #no printerId, use pi_id
-		# arg = ['/home/pi/raspi/pinger/webcam_routine.sh', str(pi_id)]
-		pass # do nothing if there is no printer_id
-	else:
-		arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count)]
-		p=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
-	pic_count = pic_count +1
-	print '\n\n\n --------end of webcam upload-------- \n\n\n'
-
 def print500Response(bodyString):
 	print bodyString
+
+
+#----------------------------------/\------------------------------------#
+#----------------------------------||------------------------------------#
+#------------------------------MAIN BRAIN--------------------------------#
+#-----------------------------|__________|-------------------------------#
+#-----------------------------|          |-------------------------------#
+#--------------------------------DRIVER----------------------------------#
+#----------------------------------||------------------------------------#
+#----------------------------------\/------------------------------------#
+
+# From: http://twistedmatrix.com/documents/current/web/howto/client.html
+class StringProducer(object): 
+	implements(IBodyProducer)
+
+	def __init__(self, body):
+		self.body = body
+		self.length = len(body)
+
+	def startProducing(self, consumer):
+		consumer.write(self.body)
+		return succeed(None)
+
+	def pauseProducing(self):
+		pass
+
+	def stopProducing(self):
+		pass
+	
+
+# From: http://twistedmatrix.com/documents/current/web/howto/client.html
+class BeginningPrinter(Protocol):
+	def __init__(self, finished,remaining):
+		self.finished = finished
+#		self.remaining = remaining
+		self.display = ''
+	def dataReceived(self, bytes):
+#		if self.remaining:
+			self.display += bytes
+#			self.remaining -= len(bytes[:self.remaining])
+
+	def connectionLost(self, reason):
+		if reason.getErrorMessage().startswith('Response body fully received'):
+			self.finished.callback(self.display)
+		else:
+			print reason.printTraceback()
+
+
 
 def makeCmdlineReq(cmd,params = {}):
 	unixEndPoint = endpoints.UNIXClientEndpoint(reactor, '/home/pi/raspi/makerbot/conveyor/conveyord.socket')
@@ -619,7 +654,7 @@ if __name__ == '__main__':
 	cookieJar = CookieJar()
 	agent = CookieAgent(Agent(reactor), cookieJar)
 	status = 'done'
-	l = task.LoopingCall(makeRequest,status)
+	l = task.LoopingCall(makeRequest,status) #talks to server
 	#jsonDebug
 	#disable this to stop posting and receiving info to/from the website
 	l.start(5)
