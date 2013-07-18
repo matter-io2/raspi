@@ -1,5 +1,5 @@
 # this is Drew's change!!!  booya
-#comment #2
+#based off control2.py 
 
 #what drew's script does now
 # - connect,print,cancel
@@ -310,6 +310,17 @@ def printFile(fileName):
 #DREW- end
 
 #LIGHTS - fLASH GREEN WHEN GOING
+#gets and returns printer ID in a string
+def getPrinterID():
+	arg='lsusb'
+	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+	data = p.communicate()
+	split_data = data[0].split()
+	if 'src' in split_data:
+		ip_address = split_data[split_data.index('src')+1]
+		print 'LAN IP Address:' + str(ip_address)
+	else:
+		print 'no LAN IP address assigned - missing "src" key'
 
 def findPrinter_and_Ip():
 	global printer_profile, printer_firmware, printer_printerId 
@@ -336,21 +347,19 @@ def findPrinter_and_Ip():
 				break
 			print (line)
 			#Ultimaker only send back an ID when it wants :(
-			if line.find('echo: External',0,len(line)) != -1:
-				(before,sep,after)=line.partition('-')
-				(b,s,a)=after.partition(' ')
-				printer_printerId = b
-				online = True
-				break
+			# if line.find('echo: External',0,len(line)) != -1:
+			# 	(before,sep,after)=line.partition('-')
+			# 	(b,s,a)=after.partition(' ')
+			# 	printer_printerId = b
+			# 	online = True
+			# 	break
 			#this will always tell you when it's connected but comes before the possible ID
 			elif line.find('Printer is now online',0,len(line))>=0:#if its connected
-			 	printer_printerId = "Batman"
-			 	print "The Printer has no ID, it's a phantom of the night"
+			 	printer_printerId = getPrinterID()
 			 	online = True
 			 	break
 			elif line.find('ok',0,len(line))>=0:#if its connected
-				printer_printerId = "Batman"
-				print "The Printer has no ID, it's a phantom of the night"
+				printer_printerId = getPrinterID()
 				online = True
 				break
 
