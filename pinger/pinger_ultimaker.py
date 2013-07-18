@@ -332,6 +332,7 @@ def getPrinterID():
 				IDkey = str_data[(start-13):(start-4)]
 				found = True
 				break
+			start = max_index+1#should find next iteration of "\n"
 		return str(IDkey)
 	if found==False:
 		return 'Connected with no ID'
