@@ -317,7 +317,7 @@ def getPrinterID():
 	data = p.communicate()
 	split_data = data[0].split()
 	if 'Arduino' in split_data:
-		IDkey = split_data[split_data.index('src')-1]
+		IDkey = split_data[split_data.index('Arduino')-1]
 		return str(IDkey)
 	else:
 		return 'Connected with no ID'
