@@ -324,7 +324,8 @@ def getPrinterID():
 	else:#returns ID when printer has no name
 		for i in split_data:
 			print i
-			if (i == 'ID') and (split_data[split_data.index(i)+2]=='Bus' or len(split_data)<split_data.index(i)+2):
+			split_data[len(split_data)]
+			if (i == 'ID') and (split_data[split_data.index(i)+2]=='Bus' or split_data[split_data.index(i)+2]):
 				IDkey= split_data[split_data.index(i)+1]
 				found=True
 				return str(IDkey)
