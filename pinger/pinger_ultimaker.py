@@ -323,12 +323,13 @@ def getPrinterID():
 		return str(IDkey)
 	else:#returns ID when printer has no name
 		start = 0
-		end = len(data[1])
+		str_data=str(data)
+		end = len(str_data)
 		while True:
-			max_index=data[1].rfind(' \\n',start, end)
+			max_index=str_data.rfind(' \n',start, end)
 			start = max_index
 			if data[1][start-14, start -12]=='ID':#could be plus or minus one
-				IDkey = data[1][start-13,start-4]
+				IDkey = str_data[start-13,start-4]
 				break
 		found=True
 		return str(IDkey)
