@@ -348,21 +348,17 @@ def findPrinter_and_Ip():
 				break
 			print (line)
 			#Ultimaker only send back an ID when it wants :(
-			# if line.find('echo: External',0,len(line)) != -1:
-			# 	(before,sep,after)=line.partition('-')
-			# 	(b,s,a)=after.partition(' ')
-			# 	printer_printerId = b
-			# 	online = True
-			# 	break
-			#this will always tell you when it's connected but comes before the possible ID
-			if line.find('Printer is now online',0,len(line))>=0:#if its connected
+			if line.find('echo: External',0,len(line)) != -1:
+				(before,sep,after)=line.partition('-')
+				(b,s,a)=after.partition(' ')
+				printer_printerId = b
+				online = True
+				break
+				#this will always tell you when it's connected but comes before the possible ID
+			elif (line != None) and (line != ''):#if its connected
 			 	printer_printerId = getPrinterID()
 			 	online = True
 			 	break
-			elif line.find('ok',0,len(line))>=0:#if its connected
-				printer_printerId = getPrinterID()
-				online = True
-				break
 
 		print "!!new printerId", printer_printerId
 
