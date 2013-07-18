@@ -317,10 +317,10 @@ def getPrinterID():
 	data = p.communicate()
 	split_data = data[0].split()
 	if 'src' in split_data:
-		ip_address = split_data[split_data.index('src')+1]
-		print 'LAN IP Address:' + str(ip_address)
+		IDkey = split_data[split_data.index('src')+1]
+		return str(IDkey)
 	else:
-		print 'no LAN IP address assigned - missing "src" key'
+		return 'Connected with no ID'
 
 def findPrinter_and_Ip():
 	global printer_profile, printer_firmware, printer_printerId 
@@ -354,7 +354,7 @@ def findPrinter_and_Ip():
 			# 	online = True
 			# 	break
 			#this will always tell you when it's connected but comes before the possible ID
-			elif line.find('Printer is now online',0,len(line))>=0:#if its connected
+			if line.find('Printer is now online',0,len(line))>=0:#if its connected
 			 	printer_printerId = getPrinterID()
 			 	online = True
 			 	break
