@@ -312,14 +312,27 @@ def printFile(fileName):
 #LIGHTS - fLASH GREEN WHEN GOING
 #gets and returns printer ID in a string
 def getPrinterID():
+	found = False
 	arg='lsusb'
 	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 	data = p.communicate()
 	split_data = data[0].split()
 	if 'Arduino' in split_data:
 		IDkey = split_data[split_data.index('Arduino')-1]
+		found = True
 		return str(IDkey)
-	else:
+	else:#returns ID when printer has no name
+		start = 0
+		end = data.len()
+		while True:
+			max_index=data.rfind(' \\n',start, end)
+			start = max_index
+			if data[start-14, start -12]=='ID':#could be plus or minus one
+				IDkey = data[start-13,start-4]
+				break
+		found=True
+		return str(IDkey)
+	if found==False:
 		return 'Connected with no ID'
 
 def findPrinter_and_Ip():
