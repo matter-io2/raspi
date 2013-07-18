@@ -324,10 +324,10 @@ def getPrinterID():
 	else:#returns ID when printer has no name
 		for i in split_data:
 			print i
-			# if deviceName.find('\\n',0,1) != -1:
-			# 	IDkey=
-			# 	found=True
-			# 	return str(IDkey)
+			if (i == 'ID') and ((split_data[split_data.index(i)+2] == 'Bus') or (split_data[split_data.index(i)+2] == None)):
+				IDkey= split_data[split_data.index(i)+1]
+				found=True
+				return str(IDkey)
 	if found==False:
 		return 'Connected with no ID'
 
