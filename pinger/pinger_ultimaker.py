@@ -328,7 +328,7 @@ def getPrinterID():
 		while True:
 			max_index=str_data.rfind(' \n',start, end)
 			start = max_index
-			if data[1][start-14, start -12]=='ID':#could be plus or minus one
+			if str_data[start-14, start -12]=='ID':#could be plus or minus one
 				IDkey = str_data[start-13,start-4]
 				break
 		found=True
