@@ -327,7 +327,11 @@ def getPrinterID():
 			print i
 			cnt=cnt+1
 			if (i == 'ID'):
-				if split_data[cnt+2]=='Bus' or (len(split_data)-1)<(cnt+2):
+				if (len(split_data)-1)<(cnt+2):
+					IDkey= split_data[cnt+1]
+					found=True
+					return str(IDkey)
+				elif split_data[cnt+2]=='Bus':
 					IDkey= split_data[cnt+1]
 					found=True
 					return str(IDkey)
