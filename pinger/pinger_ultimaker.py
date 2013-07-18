@@ -324,7 +324,6 @@ def getPrinterID():
 	else:#returns ID when printer has no name
 		cnt=-1
 		for i in split_data:
-			print i
 			cnt=cnt+1
 			if (i == 'ID'):
 				if (len(split_data)-1)<(cnt+2):
