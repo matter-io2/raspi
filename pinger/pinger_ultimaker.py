@@ -321,7 +321,6 @@ def getPrinterID():
 		IDkey = split_data[split_data.index('Arduino')-1]
 		found = True
 		return str(IDkey)
-		break
 	else:#returns ID when printer has no name
 		for i in split_data:
 			print i
@@ -329,7 +328,6 @@ def getPrinterID():
 				IDkey= split_data[split_data.index(i)+1]
 				found=True
 				return str(IDkey)
-				break
 	if found==False:
 		return 'Connected with no ID'
 
