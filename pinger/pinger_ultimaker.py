@@ -330,8 +330,8 @@ def getPrinterID():
 			start = max_index
 			if str_data[(start-14):(start -12)]=='ID':#could be plus or minus one
 				IDkey = str_data[(start-13):(start-4)]
+				found = True
 				break
-		found=True
 		return str(IDkey)
 	if found==False:
 		return 'Connected with no ID'
