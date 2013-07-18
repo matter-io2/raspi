@@ -322,18 +322,12 @@ def getPrinterID():
 		found = True
 		return str(IDkey)
 	else:#returns ID when printer has no name
-		start = 0
-		str_data=str(data)
-		end = len(str_data)
-		while True:
-			max_index=str_data.rfind(' \\n',start, end)
-			start = max_index
-			if str_data[(start-14):(start -12)]=='ID':#could be plus or minus one
-				IDkey = str_data[(start-13):(start-4)]
-				found = True
-				break
-			start = max_index+1#should find next iteration of "\n"
-		return str(IDkey)
+		for i in split_data:
+			print i
+			# if deviceName.find('\\n',0,1) != -1:
+			# 	IDkey=
+			# 	found=True
+			# 	return str(IDkey)
 	if found==False:
 		return 'Connected with no ID'
 
