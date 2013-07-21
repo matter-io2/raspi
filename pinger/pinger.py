@@ -76,12 +76,14 @@ def mainBrain():
 	
 	status='done'
 	#INTERNET mediation - user print to debug
+	print '\n----INTERNET mediation----\n'
 	getInetInfo()
 	if lost_packets>=6: # no ip addres, reconnect after server timeout
 		reconnectInternet(inet_iface)
 		#should handle hotswapping...
 
 	#PRINTER mediation - user print to debug
+	print '\n----PRINTER mediation----\n'
 	if printer_printerId=='':
 		getPrinterType()
 		print 'printer_type = ', printer_type
@@ -99,12 +101,15 @@ def mainBrain():
 
 	#PING SERVER... once ip_address saving is consistent add - if ip_address!=''
 	#ping server with printer or pi info
+	print '\n----SERVER mediation----\n'
 	makeRequest('printer',status) #status=done
 	#makeRequest(req_type,status) #status=done
 
 	#WEBCAM
+	print '\n----WEBCAM mediation----\n'
 	webcamPic()
 
+	print '\n----UPDATE mediation----\n'
 	if not printer_inUse and ip_address!='':
 		#check for git update
 		arg='/home/pi/raspi/piConfig/update_routine.sh'
@@ -861,7 +866,7 @@ if __name__ == '__main__':
 #	f.start(5)
 
 	f = task.LoopingCall(mainBrain)
-	f.start(5)	
+	f.start(5)
 	#webcam routine now called in mainBrain
 	#g = task.LoopingCall(webcam_pic) #takes image and uploads it
 	#g.start(5)

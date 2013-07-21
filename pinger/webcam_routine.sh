@@ -11,7 +11,7 @@ then
 	echo server_address = $1
 	echo printerId passed = $2,
 	echo pic_count = $3
-	echo 
+	echo debug_webcam = $4
 	pic_num=$3
 	old_pic=$((pic_num-3))
 	#fswebcam -r 960x544 -S 8 -d /dev/video0 --jpeg 95 --save /home/pi/Des
