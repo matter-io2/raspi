@@ -93,7 +93,8 @@ def mainBrain():
 
 	#PING SERVER... once ip_address saving is consistent add - if ip_address!=''
 	#ping server with printer or pi info
-	makeRequest(req_type,status) #status=done
+	makeRequest('printer',status) #status=done
+	#makeRequest(req_type,status) #status=done
 
 	#WEBCAM
 	webcamPic()
@@ -394,17 +395,17 @@ def makeRequest(req_type,status):
 	print 'lost packet num =', str(lost_packets)
 	lost_packets = lost_packets+1
 
-# adds next method to polling
+	# adds next method to polling
 	d.addCallback(cbRequest, cookieJar)
 
-#this should live in main brain somewhere higher
-	# if lost_packets >= 5 and not printer_inUse:
-	if lost_packets > 6: # 30 seconds  
-		print 'no response from server - attempting reconnect via bash script now'
-		print '(>=6 packets missed, 30 seconds without connection)'
-		lost_packets=0
-		reconnectInternet()
-	# assume packet is lost unless you get a response in cbRequest()
+	# #this should live in main brain somewhere higher
+	# # if lost_packets >= 5 and not printer_inUse:
+	# if lost_packets > 6: # 30 seconds  
+	# 	print 'no response from server - attempting reconnect via bash script now'
+	# 	print '(>=6 packets missed, 30 seconds without connection)'
+	# 	lost_packets=0
+	# 	reconnectInternet()
+	# # assume packet is lost unless you get a response in cbRequest()
 
 #data sent back from server
 def cbRequest(response, cookieJar):
@@ -503,8 +504,11 @@ def printFile(fileName):
 #LIGHTS - fLASH GREEN WHEN GOING
 
 def print500Response(bodyString):
-	print bodyString
-	text_file = open("error.html", "w")
+	
+	print 'error 500!!! saved log out to Desktop'
+	#print bodyString
+
+	text_file = open("/home/pi/Desktop/error.html", "w")
 	text_file.write("%s"%bodyString)
 	text_file.close()
 
