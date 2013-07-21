@@ -11,10 +11,11 @@ then
 	echo server_address = $1
 	echo printerId passed = $2,
 	echo pic_count = $3
+	echo 
 	pic_num=$3
 	old_pic=$((pic_num-3))
 	#fswebcam -r 960x544 -S 8 -d /dev/video0 --jpeg 95 --save /home/pi/Des
-	if [ "$1" -eq "1" ]
+	if [ "$3" -eq "1" ]
 	then
 		#clear everything when pinger starts
 		sudo rm /dev/shm/*

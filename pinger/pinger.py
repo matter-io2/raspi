@@ -21,6 +21,10 @@ from twisted.web.iweb import IBodyProducer
 #server = 'http://matter.io/'
 server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 
+debug_webcam=False
+debug_server_response=False
+debug_internet=True
+
 inet_iface=''
 network_name=''
 link_quality=''
@@ -273,6 +277,7 @@ def reconnectPrinter():
 def webcamPic():
 	global server, pic_count
 	global printer_printerId, pi_id
+	global debug_webcam
 	print '\n\n\n --------starting webcam_routine call-------- \n\n\n'
 	print 'printer id = ',printer_printerId
 	address = server+'webcamUpload'
@@ -281,7 +286,7 @@ def webcamPic():
 		#arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(pi_id),str(pic_count)]
 		pass # do nothing if there is no printer_id
 	else:
-		arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count)]
+		arg = ['sudo /home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count),str(debug_webcam)]
 		p=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 	pic_count = pic_count +1
 	print '\n\n\n --------webcam_routine call executing now-------- \n\n\n'
