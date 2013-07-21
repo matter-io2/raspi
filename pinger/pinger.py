@@ -80,6 +80,8 @@ def mainBrain():
 	#PRINTER mediation - user print to debug
 	if printer_printerId=='':
 		getPrinterType()
+		print 'printer_type = ' printer_type
+		print 'printer_type_ID = ' printer_type_ID
 		if printer_type=='Makerbot':
 			reconnectPrinter()
 		elif printer_type=='Ultimaker':
@@ -102,7 +104,7 @@ def mainBrain():
 	if not printer_inUse and ip_address!='':
 		#check for git update
 		arg='/home/pi/raspi/piConfig/update_routine.sh'
-		p1=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+		p_webcam=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 		#this script runs git fetch and will update branches if there's something new available.
 		# it will also restart the startup script (canceling pinger and conveyor_service)
 		#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
