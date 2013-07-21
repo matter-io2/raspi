@@ -504,9 +504,9 @@ def printFile(fileName):
 
 def print500Response(bodyString):
 	print bodyString
-    text_file = open("error.html", "w")
+	text_file = open("error.html", "w")
 	text_file.write("%s"%bodyString)
-	text_file.close()	
+	text_file.close()
 
 
 #----------------------------------/\------------------------------------#
