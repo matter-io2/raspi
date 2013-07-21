@@ -13,35 +13,37 @@
 echo "trying to fetch"
 sudo -u pi git fetch origin
 echo "fetch finished"
-new_update=false
-reslog_working=$(git log HEAD..origin/working_base --oneline)
-reslog_dev=$(git log HEAD..origin/dev --oneline)
+# new_update=false
 
-if [ "${reslog_working}" != "" ] ; then
-	new_update=true
-	echo 'updating working_base branch'
-	sudo killall python
-	git checkout working_base
-	git merge origin/working_base #completing the pull
-	echo 'new update on working_base, restart pinger at next stop'>/home/pi/raspi/piConfig/update.log
-else
-	echo '"working_base" branch already up-to-date'
-fi
+reslog_dev=$(git log HEAD..origin/dev --oneline)
 if [ "${reslog_dev}" != "" ] ; then
-	new_update=true
+	# new_update=true
 	echo 'updating dev branch'
 	sudo killall python
-	git checkout dev
-	git merge origin/dev
+	sudo -u pi git checkout dev
+	sudo -u pi git merge origin/dev
 	echo 'new update on dev'>/home/pi/raspi/piConfig/update.log
 else
 	echo '"dev" branch already up-to-date'
 fi
 
-if [ $new_update ]; then
+
+# reslog_working=$(git log HEAD..origin/working_base --oneline)
+# if [ "${reslog_working}" != "" ] ; then
+# 	new_update=true
+# 	echo 'updating working_base branch'
+# 	sudo killall python
+# 	git checkout working_base
+# 	git merge origin/working_base #completing the pull
+# 	echo 'new update on working_base, restart pinger at next stop'>/home/pi/raspi/piConfig/update.log
+# else
+# 	echo '"working_base" branch already up-to-date'
+# fi
+
+# if [ $new_update ]; then
 	
 
-fi
+# fi
 
 
 #greg's comment #1
