@@ -22,8 +22,10 @@ from twisted.web.iweb import IBodyProducer
 server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 
 inet_iface=''
-#connection = 'eth0'
-#connection = 'wlan0'
+network_name=''
+link_quality=''
+signal_level=''
+noise_level=''
 
 lost_packets = 0
 pic_count = 0
@@ -154,6 +156,7 @@ def get_pi_id():  #saves raspi's serial # as unique pi_id
 # saves connection interface and ip address
 def getInetInfo():
 	global ip_address, inet_iface
+	global network_name, link_quality, signal_level, noise_level
 	#Returns the current IP address
 	arg='ip route list'
 	p1=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
@@ -162,26 +165,33 @@ def getInetInfo():
 	if data1[0]=='': #no internet CNX
 		#see if ethernet cable is physically connected
 		p2=subprocess.Popen('cat /sys/class/net/eth0/carrier',shell=True,stdout=subprocess.PIPE)
-		data2=p2.communicate()
-		if bool(data2[0][0]): #tells me whether ethernet is connected or not 1=connected, 0=not connected
+		data_eth=p2.communicate()
+		if bool(data_eth[0][0]): #tells me whether ethernet is connected or not 1=connected, 0=not connected
 			#ethernet is still attached, try to reconnect to eth0!
 			inet_iface='eth0' #reconnect on ethernet even if it's not in the ip table right now...because it's still plugged in
 		else:  #no ethernet, reconnect on wlan0
 			inet_iface='wlan0'
 	else: #internet CNX! - parse data
-		split_data1 = data1[0].split()
+		split_ipRoute = data1[0].split()
 		#get interface - doesn't reset until another connection comes online
-		if 'eth0' in split_data1:
+		if 'eth0' in split_ipRoute:
 			inet_iface='eth0'
-		elif 'wlan0' in split_data1:
+		elif 'wlan0' in split_ipRoute:
 			inet_iface='wlan0'
+			p3=subprocess.Popen('iwconfig wlan0',shell=True,stdout=subprocess.PIPE)
+			data_wlan0=p3.communicate()
+			network_name=data_wlan0[0].split('ESSID:"')[1].split('"')[0]
+			link_quality=data_wlan0[0].split('Link Quality=')[1].split(' ')[0]
+			signal_level=data_wlan0[0].split('Signal level=')[1].split(' ')[0]
+			noise_level=data_wlan0[0].split('Noise level=')[1].split('\n')[0]
 		#save lan_ip
-		if 'src' in split_data1:
-			ip_address = split_data1[split_data1.index('src')+1]
+		if 'src' in split_ipRoute:
+			ip_address = split_ipRoute[split_ipRoute.index('src')+1]
 			print 'LAN IP Address:' + str(ip_address)
 		else:
 			print 'no LAN IP address assigned - missing "src" key'
 			ip_address = ''
+
 
 #reconnects using sudo ifup [eth0/wlan0]
 def reconnectInternet():
@@ -284,6 +294,7 @@ def makeRequest(req_type,status):
 	global pi_id
 	global server, lost_packets
 	global inet_iface, pic_count
+	global network_name,link_quality,signal_level, noise_level
 
 	address = server+'printerPing/'	
 	print 'upload address = ',address
