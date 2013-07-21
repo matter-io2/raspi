@@ -27,7 +27,9 @@ inet_iface=''
 
 lost_packets = 0
 pic_count = 0
-updateAvailable=False
+
+printer_type=''
+printer_type_ID=''
 
 printer_profile = 0
 printer_firmware = 0
@@ -62,23 +64,22 @@ ip_address = ''
 
 def mainBrain():
 #variables I need - 
-	global server
 	global inet_iface, lost_packets, pic_count
-	global printer_inUse
-	global pi_id, online
-	global updateAvailable
+	global printer_type, printer_printerId, printer_inUse
+	global pi_id, online, ip_address
+	
 	status='done'
-	#internet mediation - user print to debug
+	#INTERNET mediation - user print to debug
 	getInetInfo()
 	if lost_packets>=6: # no ip addres, reconnect after server timeout
 		reconnectInternet(inet_iface)
 		#should handle hotswapping...
 
-	#printer mediation - user print to debug
+	#PRINTER mediation - user print to debug
 	if printer_printerId=='':
 		getPrinterType()
 		if printer_type=='Makerbot':
-			pi
+			reconnectPrinter()
 		elif printer_type=='Ultimaker':
 			print 'start ultimaker pinger'
 		elif printer_type=='LulzBot':
@@ -87,11 +88,12 @@ def mainBrain():
 	else:
 		req_type='printer'
 
+
+	#PING SERVER... once ip_address saving is consistent add - if ip_address!=''
 	#ping server with printer or pi info
-	#if ip_address!=''
 	makeRequest(req_type,status) #status=done
 
-	#call webcam routine
+	#WEBCAM
 	webcamPic()
 
 	if not printer_inUse and ip_address!='':
@@ -105,18 +107,9 @@ def mainBrain():
 		#upload last job's log file
 		makeRequest('log',status) #status=done
 
-	#logging:
-	#
+	#LOGGING:
+	
 
-#each loop
-#checks
-# 	internet interface
-#	printer connected, if not get type
-#	webcam_routine
-#	server ping (pi_only, printer_cnx, log post, updating!)
-#	update via git
-
-# shit that needs to wait - log posting and update via git
 
 #----implement--------
 # mainBrain script
@@ -155,16 +148,19 @@ def get_pi_id():  #saves raspi's serial # as unique pi_id
 	print 'using old pi id until the server accepts unique pi_idz'
 	pi_id = 'ASDF1234'
 
+
 #---------INTERNET subroutines------------
 # From: http://cagewebdev.com/index.php/raspberry-pi-showing-some-system-info-with-a-python-script/
 # saves connection interface and ip address
 def getInetInfo():
-	global ip_address, inet_iface, lost_packets
+	global ip_address, inet_iface
 	#Returns the current IP address
 	arg='ip route list'
 	p1=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 	data1 = p1.communicate()
+	#determine active internet interface - eth0/wlan0
 	if data1[0]=='': #no internet CNX
+		#see if ethernet cable is physically connected
 		p2=subprocess.Popen('cat /sys/class/net/eth0/carrier',shell=True,stdout=subprocess.PIPE)
 		data2=p2.communicate()
 		if bool(data2[0][0]): #tells me whether ethernet is connected or not 1=connected, 0=not connected
@@ -201,9 +197,11 @@ def reconnectInternet():
 		print 'printing data from python...\n\n\n'
 		print data
 
+
 #---------PRINTER subroutines------------
 #uses lsusb to get printer make (used to decide which pinger file to use)
 def getPrinterType():
+	global printer_type, printer_type_ID
 	found = False
 	arg='lsusb'
 	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
@@ -250,15 +248,18 @@ def getPrinterType():
 #attempts connection to printer
 def reconnectPrinter():
 	global printer_profile, printer_firmware, printer_printerId 
-	if printer_printerId == '':
-		print 'trying to connect to printer...'
-		online == False
-		makeCmdlineReq('hello')  # handshake!  
-		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
+	print 'trying to connect to printer...'
+	online == False
+	makeCmdlineReq('hello')  # handshake!  
+	makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  
+	# gets printer properties
+	#may need to change profile_name, not sure...
+
 
 #---------WEBCAM subroutine------------
 def webcamPic():
-	global printer_printerId, pi_id, pic_count, server
+	global server, pic_count
+	global printer_printerId, pi_id
 	print '\n\n\n --------starting webcam_routine call-------- \n\n\n'
 	print 'printer id = ',printer_printerId
 	address = server+'webcamUpload'
@@ -272,16 +273,18 @@ def webcamPic():
 	pic_count = pic_count +1
 	print '\n\n\n --------webcam_routine call executing now-------- \n\n\n'
 
+
 #---------SERVER subroutines-----------
 #http POST to website - also 
 def makeRequest(req_type,status):
-	global printer_profile, printer_firmware, printer_printerId, printer_inUse, online
+	global printer_type, printer_type_ID,printer_profile, printer_firmware, printer_printerId, printer_inUse, online
 	global printer_tool1_temp, printer_tool2_temp, printer_bed_temp
 
 	global job_num, job_process, job_progress, job_conclusion
 	global pi_id
-	global lost_packets
-	global server
+	global server, lost_packets
+	global inet_iface, pic_count
+
 	address = server+'printerPing/'	
 	print 'upload address = ',address
 
@@ -400,7 +403,7 @@ def cbRequest(response, cookieJar):
 
 	headersDict = {}
 	for i in response.headers.getAllRawHeaders():
-#		print i
+	#		print i
 		headersDict[i[0]] = i[1]
 	
 	finished = Deferred()
