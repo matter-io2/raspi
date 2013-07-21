@@ -64,7 +64,7 @@ def mainBrain():
 #variables I need - 
 	global server
 	global inet_iface, lost_packets, pic_count
-	global printer_inUse, 
+	global printer_inUse
 	global pi_id, online
 	global updateAvailable
 	status='done'
@@ -163,7 +163,7 @@ def getInetInfo():
 	#Returns the current IP address
 	arg='ip route list'
 	p1=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
-	data1 = p.communicate()
+	data1 = p1.communicate()
 	if data1[0]=='': #no internet CNX
 		p2=subprocess.Popen('cat /sys/class/net/eth0/carrier',shell=True,stdout=subprocess.PIPE)
 		data2=p2.communicate()
@@ -242,7 +242,7 @@ def getPrinterType():
 					printer_type_ID= split_data[cnt+1]
 					printer_type= "Unknown"
 					found = True
-	if printer_type = 'Unknown':
+	if printer_type=='Unknown':
 		print 'Not a Recognized Printer \n RepRaps may still work'
 	if found==False:
 		print 'No Printer Found'
@@ -330,7 +330,7 @@ def makeRequest(req_type,status):
 							'job_fail_msg':job_fail_msg,
 							'status':status}))
 					)
-	elif req_type=='pi'
+	elif req_type=='pi':
 		print 'sending pi data -- no printer id'
 	# debugger that shows what is being posted to the server (see agent.request for actual posting)	
 		print 'Data Sent:',urllib.urlencode({'type':'update',
@@ -349,11 +349,9 @@ def makeRequest(req_type,status):
 															'link_quality':link_quality,
 															'signal_level':signal_level,
 															'noise_level':noise_level,
-															'':,
-
 															'status':status}))
 					)
-	elif req_type=='log'
+	elif req_type=='log':
 		d = agent.request(	'POST',
 							address,
 							Headers({'Content-Type': ['application/x-www-form-urlencoded']}),
@@ -826,14 +824,16 @@ if __name__ == '__main__':
 	cookieJar = CookieJar()
 	agent = CookieAgent(Agent(reactor), cookieJar)
 	status = 'done'
-	l = task.LoopingCall(makeRequest,status) #talks to server
+#	l = task.LoopingCall(makeRequest,status) #talks to server
 	#jsonDebug
 	#disable this to stop posting and receiving info to/from the website
-	l.start(5)
+#	l.start(5)
 	print 'Reactor Started'
-	f = task.LoopingCall(findPrinter_and_Ip)
-	f.start(5)
-	
+#	f = task.LoopingCall(findPrinter_and_Ip)
+#	f.start(5)
+
+	f = task.LoopingCall(mainBrain)
+	f.start(5)	
 	#webcam routine now called in mainBrain
 	#g = task.LoopingCall(webcam_pic) #takes image and uploads it
 	#g.start(5)
