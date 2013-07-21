@@ -24,6 +24,8 @@ connection = 'wlan0'
 lost_packets = 0
 pic_count = 0
 
+printer_type = ''
+printer_type_ID = ''
 printer_profile = 0
 printer_firmware = 0
 printer_printerId = ''
@@ -56,7 +58,7 @@ known_printers = ['']
 def mainBrain():
 #variables I need - 
 	global printer_printerId
-	global connection, lost_packets, pic_count
+	global connection, lost_packets, pic_count, ip_address
 	global printer_inUse, 
 	global pi_id, online
 
@@ -70,26 +72,30 @@ def mainBrain():
 #git update
 
 	#Internet moderation
+	if ip_address == '':
+		getIpAddress()
 	if lost_packets > 6: # 30 seconds w/ no response (assumes 5s loop)- assume packet is lost unless you get a response in cbRequest()
 		print 'no response from server - attempting reconnect via bash script now\n30 seconds without connection'
 		lost_packets=0
 		reconnectInternet()
-
 	#printer moderation
 	if printer_printerId == '': # no printer
-		
+		getPrinterType()
+		if printer_type == 'Makerbot':
+			print 'found a makerbot in the makerbot script'
+			printerConnect() #connects to makerbot printers
+			pass # we're already in the Makerbot script
 
-# if not connected:
-# 	if lsusb has my printer id...: 
-# 		attempt connect...
-# 	elif lsusb has some other printer id...
-# 		start other printer's pinger script
-# 	else:
-# 		print 'no known printer id's attached
-# if webcam attached
-# 	take webcam photo and post
+		elif printer_type == 'Utlimaker':
+			print '\n\n START ULTIMAKER pinger \n\n'
+			print 'switching not yet implemented \n\n'
+		elif printer_type == 'LulzBot':
+			print '\n\n START LULZBOT pinger \n\n'
+			print 'switching not yet implemented \n\n'
+		else:
+			print 'no known printers in lsusb'
 
-def findPrinter
+
 #----implement--------
 # mainBrain script
 # if wifi lost:   
@@ -109,23 +115,28 @@ def findPrinter
 # contains all low level commands
 # - connect, print, cancel, monitor
 
+
+	#
+
+
+# if not connected:
+# 	if lsusb has my printer id...: 
+# 		attempt connect...
+# 	elif lsusb has some other printer id...
+# 		start other printer's pinger script
+# 	else:
+# 		print 'no known printer id's attached
+# if webcam attached
+# 	take webcam photo and post
+
 def initialize(): #startup script, only run once at beginning, run here because global variables aren't initialized yet in __main__
 	get_pi_id()
+	getPrinterType() # I should have this on startup...
 
-def findPrinter_and_Ip():
-	global printer_profile, printer_firmware, printer_printerId 
-	if printer_printerId == '':
-		print 'trying to connect to printer...'
-		online == False
-		makeCmdlineReq('hello')  # handshake!  
-		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
-		# print '!!new printerId', printer_printerId
-	# if ip_address == '' and not printer_inUse:
-	if ip_address == '':
-		get_ipaddress()
-
+#------------------------------------------------------------------------------------------------------------------------
+#1 - get ip address, figure out what connection is being used...
 # From: http://cagewebdev.com/index.php/raspberry-pi-showing-some-system-info-with-a-python-script/
-def get_ipaddress():
+def getIpAddress():
 	global ip_address
 	#Returns the current IP address
 	arg='ip route list'
@@ -135,6 +146,77 @@ def get_ipaddress():
 	if 'src' in split_data:
 		ip_address = split_data[split_data.index('src')+1]
 		print 'LAN IP Address:' + str(ip_address)
+
+#------------------------------------------------------------------------------------------------------------------------
+#2 - get printer info (type, connect, get_id)
+def getPrinterType():
+	global printer_type, printer_type_ID
+	found = False
+	arg='lsusb'
+	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+	data = p.communicate()
+	split_data = data[0].split()
+	if '23c1:d314' in split_data:
+		printer_type_ID = '23c1:d314' #Makerbot Replicator
+		printer_type = 'Makerbot'
+		found = True
+	elif '23c1:b015' in split_data:
+		printer_type_ID = '23c1:b015'
+		printer_type = 'Makerbot'#Makerbot Replicator2 or Replicator2x
+		found = True
+	elif '2341:0042' in split_data:
+		printer_type_ID = '2341:0042'
+		printer_type = 'Ultimaker'
+		found = True
+	elif '27b1:0001' in split_data:
+		printer_type_ID = '27b1:0001'
+		printer_type = 'LulzBot AO100'
+		found = True
+	elif 'Arduino' in split_data:#should work for Arduino based RepRaps
+		printer_type_ID = split_data[split_data.index('Arduino')-1]
+		printer_type = 'Unknown'
+		found = True
+	#what's going on below here drew?
+	else:#returns ID when printer has no name
+		cnt=-1
+		for i in split_data:
+			cnt=cnt+1
+			if (i == 'ID'):
+				if (len(split_data)-1)<(cnt+2):
+					printer_type_ID= split_data[cnt+1]
+					printer_type= "Unknown"
+					found = True
+				elif split_data[cnt+2]=='Bus':
+					printer_type_ID= split_data[cnt+1]
+					printer_type= "Unknown"
+					found = True
+	if printer_type = 'Unknown':
+		print 'Not a Recognized Printer \n RepRaps may still work'
+	if found==False:
+		print 'No Printer Found'
+
+def printerConnect():
+	print 'trying to connect to printer...'
+	online == False
+	makeCmdlineReq('hello')  # handshake!  
+	makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
+	#potential bug, this may only connect to Rep2 and not 2X or Rep1
+	#once command is pushed, response should come back through socket, but asynchronously
+
+
+
+# def findPrinter_and_Ip():
+# 	global printer_profile, printer_firmware, printer_printerId 
+
+# 	if printer_printerId == '':
+# 		print 'trying to connect to printer...'
+# 		online == False
+# 		makeCmdlineReq('hello')  # handshake!  
+# 		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
+# 		# print '!!new printerId', printer_printerId
+# 	# if ip_address == '' and not printer_inUse:
+
+
 
 # reconnect on startup
 	else:
