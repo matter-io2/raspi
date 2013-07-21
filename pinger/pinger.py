@@ -84,8 +84,8 @@ def mainBrain():
 	#PRINTER mediation - user print to debug
 	if printer_printerId=='':
 		getPrinterType()
-		print 'printer_type = ' printer_type
-		print 'printer_type_ID = ' printer_type_ID
+		print 'printer_type = ', printer_type
+		print 'printer_type_ID = ', printer_type_ID
 		if printer_type=='Makerbot':
 			reconnectPrinter()
 		elif printer_type=='Ultimaker':
@@ -108,13 +108,13 @@ def mainBrain():
 	if not printer_inUse and ip_address!='':
 		#check for git update
 		arg='/home/pi/raspi/piConfig/update_routine.sh'
-		p_webcam=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+		p_new=subprocess.Popen(arg,shell=True)
 		#this script runs git fetch and will update branches if there's something new available.
 		# it will also restart the startup script (canceling pinger and conveyor_service)
 		#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
 
 		#upload last job's log file
-		makeRequest('log',status) #status=done
+		#makeRequest('log',status) #status=done
 
 	#LOGGING:
 	
@@ -286,7 +286,7 @@ def webcamPic():
 		#arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(pi_id),str(pic_count)]
 		pass # do nothing if there is no printer_id
 	else:
-		arg = ['sudo /home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count),str(debug_webcam)]
+		arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count),str(debug_webcam)]
 		p=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 	pic_count = pic_count +1
 	print '\n\n\n --------webcam_routine call executing now-------- \n\n\n'

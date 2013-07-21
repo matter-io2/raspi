@@ -1,5 +1,5 @@
 
-#! /bin/sh
+#! /bin/bash
 
 #cleanup
 #sudo killall python
