@@ -361,7 +361,7 @@ def findPrinter_and_Ip():
 			#^need to parse
 			if (line == None) or (line == ''):
 				break
-			#print (line)
+			print (line)
 			#Ultimaker only send back an ID when it wants :(
 			if line.find('echo: External',0,len(line)) != -1:
 				(before,sep,after)=line.partition('-')
