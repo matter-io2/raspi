@@ -137,8 +137,18 @@ def mainBrain():
 # - connect, print, cancel, monitor
 
 def initialize(): #startup script, only run once at beginning, run here because global variables aren't initialized yet in __main__
+	global debug_internet,debug_server_response,debug_printer_socket,debug_printer_client_socket,debug_webcam
+	print "----Debug Settings----"
+	print "internet", debug_internet
+	print "server_response", debug_server_response
+	print "printer_socket", debug_printer_socket
+	print "printer_client_socket", debug_printer_client_socket
+	print "webcam", debug_webcam
+
 	get_pi_id()
 	getInetInfo()
+
+
 
 #add real pi_id
 def get_pi_id():  #saves raspi's serial # as unique pi_id

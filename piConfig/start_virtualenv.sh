@@ -5,6 +5,8 @@ cd /home/pi
 
 
 killall python
+sudo rm /dev/shm/*.jpg #webcam cache location cleared
+
 cd /home/pi/raspi/makerbot/conveyor/
 rm conveyord.socket conveyord.pid conveyord.avail.lock conveyord.log
 virtualenv/bin/python conveyor_service.py -c conveyor-debian.conf
