@@ -107,9 +107,11 @@ def mainBrain():
 		elif printer_type == 'Utlimaker':
 			print '\n\n START ULTIMAKER pinger \n\n'
 			print 'switching not yet implemented \n\n'
+			printerConnect() #now checks printer_type in Makerbot script
 		elif printer_type == 'LulzBot':
 			print '\n\n START LULZBOT pinger \n\n'
 			print 'switching not yet implemented \n\n'
+			printerConnect() #now checks printer_type in Makerbot script
 		else:
 			print 'no known printers in lsusb'
 
