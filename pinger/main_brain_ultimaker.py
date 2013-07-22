@@ -798,7 +798,8 @@ if __name__ == '__main__':
 	#disable this to stop posting and receiving info to/from the website
 	l.start(5)
 	print 'Reactor Started'
-	f = task.LoopingCall(findPrinter_and_Ip)
+	#f = task.LoopingCall(findPrinter_and_Ip)
+	f = task.LoopingCall(mainBrain)
 	f.start(5)
 	g = task.LoopingCall(webcamPic) #takes image and uploads it
 	g.start(5)
