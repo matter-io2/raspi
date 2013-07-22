@@ -208,11 +208,11 @@ def getPrinterType():
 def printerConnect():
 	print 'trying to connect to printer...'
 	online == False
-		makeCmdlineReq('hello')  # handshake!  
-		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
-		#potential bug, this may only connect to Rep2 and not 2X or Rep1
-		#once command is pushed, response should come back through socket, but asynchronously
-		print "!!new printerId", printer_printerId
+	makeCmdlineReq('hello')  # handshake!  
+	makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
+	#potential bug, this may only connect to Rep2 and not 2X or Rep1
+	#once command is pushed, response should come back through socket, but asynchronously
+	print "!!new printerId", printer_printerId
 
 
 # def findPrinter_and_Ip():
