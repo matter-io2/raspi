@@ -226,13 +226,11 @@ def printerConnect():
 # 		# print '!!new printerId', printer_printerId
 # 	# if ip_address == '' and not printer_inUse:
 
-
-
-# reconnect on startup
-	else:
-		print 'no LAN IP address assigned - missing "src" key'
-		ip_address = ''
-		reconnectInternet()
+# # reconnect on startup
+# 	else:
+# 		print 'no LAN IP address assigned - missing "src" key'
+# 		ip_address = ''
+# 		reconnectInternet()
 def get_pi_id():  #saves raspi's serial # as unique pi_id
 	global pi_id
 	arg='cat /proc/cpuinfo'
