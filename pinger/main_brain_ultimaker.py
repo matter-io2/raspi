@@ -215,22 +215,22 @@ def printerConnect():
 	print "!!new printerId", printer_printerId
 
 
-# def findPrinter_and_Ip():
-# 	global printer_profile, printer_firmware, printer_printerId 
+def findPrinter_and_Ip():
+	global printer_profile, printer_firmware, printer_printerId 
 
-# 	if printer_printerId == '':
-# 		print 'trying to connect to printer...'
-# 		online == False
-# 		makeCmdlineReq('hello')  # handshake!  
-# 		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
-# 		# print '!!new printerId', printer_printerId
-# 	# if ip_address == '' and not printer_inUse:
+	if printer_printerId == '':
+		print 'trying to connect to printer...'
+		online == False
+		makeCmdlineReq('hello')  # handshake!  
+		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
+		# print '!!new printerId', printer_printerId
+	# if ip_address == '' and not printer_inUse:
 
-# # reconnect on startup
-# 	else:
-# 		print 'no LAN IP address assigned - missing "src" key'
-# 		ip_address = ''
-# 		reconnectInternet()
+# reconnect on startup
+	else:
+		print 'no LAN IP address assigned - missing "src" key'
+		ip_address = ''
+		reconnectInternet()
 def get_pi_id():  #saves raspi's serial # as unique pi_id
 	global pi_id
 	arg='cat /proc/cpuinfo'
