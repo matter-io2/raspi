@@ -200,7 +200,7 @@ def getPrinterType():
 					printer_type_ID= split_data[cnt+1]
 					printer_type= "Unknown"
 					found = True
-	if printer_type = 'Unknown':
+	if printer_type == 'Unknown':
 		print 'Not a Recognized Printer \n RepRaps may still work'
 	if found==False:
 		print 'No Printer Found'
