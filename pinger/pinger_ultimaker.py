@@ -384,6 +384,20 @@ def findPrinter_and_Ip():
 		split_line = line.split()
 		tmp=split_line[1][2:len(split_line[1])-1]
 		print tmp
+		tmp= None
+		pron.p.send('M105')
+		line=pron.p._readline()
+		print ('line: '+line)
+		split_line = line.split()
+		tmp=split_line[1][2:len(split_line[1])-1]
+		print tmp
+		tmp= None
+		pron.p.send('M105')
+		line=pron.p._readline()
+		print ('line: '+line)
+		split_line = line.split()
+		tmp=split_line[1][2:len(split_line[1])-1]
+		print tmp
 		# pron.p.send('M117')#useless
 		# while True:
 		# 	line=pron.p._readline()
