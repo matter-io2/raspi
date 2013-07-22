@@ -65,7 +65,7 @@ def mainBrain():
 #variables I need - 
 	global printer_printerId
 	global connection, lost_packets, pic_count, ip_address
-	global printer_inUse, 
+	global printer_inUse
 	global pi_id, online
 
 #nice to have's
