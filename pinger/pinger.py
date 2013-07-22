@@ -22,6 +22,7 @@ from twisted.web.iweb import IBodyProducer
 server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 
 logPath = '/home/pi/raspi/pinger/pinger.log'
+logger = logging.getLogger(logName)		#log name
 
 debug_internet=False
 debug_server_response=True
@@ -160,7 +161,7 @@ def initialize(): #startup script, only run once at beginning, run here because 
 
 # http://docs.python.org/2/library/logging.html
 def setupLog(filepath, logName):
-	logger = logging.getLogger(logName)		#log name
+	import logger
 	hdlr = logging.FileHandler(filepath)	#i.e. '/var/tmp/myapp.log'
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 	hdlr.setFormatter(formatter)
@@ -204,6 +205,7 @@ def getInetInfo():
 		#see if ethernet cable is physically connected
 		p2=subprocess.Popen('cat /sys/class/net/eth0/carrier',shell=True,stdout=subprocess.PIPE)
 		data_eth=p2.communicate()
+
 		if bool(data_eth[0][0]): #tells me whether ethernet is connected or not 1=connected, 0=not connected
 			#ethernet is still attached, try to reconnect to eth0!
 			inet_iface='eth0' #reconnect on ethernet even if it's not in the ip table right now...because it's still plugged in
@@ -483,7 +485,7 @@ def parseJSON(bodyString):
 	global printer_inUse, job_process, job_progress, job_conclusion, job_num, job_id
 	global cancelCmdTime, job_started
 	global no_job_id_key_count
-
+	global logger
 
 	bodyDict = json.loads(bodyString)
 	print bodyDict
@@ -545,6 +547,7 @@ def parseJSON(bodyString):
 import downloader.downloader as dl
 def downloadFile(url):
 	global job_filename
+	global logger
 	agent = Agent(reactor)
 	print "In Download File:",url
 
@@ -559,6 +562,7 @@ def downloadFile(url):
 
 import printer.printer as p
 def printFile(fileName):
+	global logger
 	print 'In PrintFile',fileName  # shows file path
 	#determine which slicer was used...
 	slicer = "miraclegrue" 
@@ -763,6 +767,7 @@ class UnixSocketProtocol(Protocol):
 		global pi_id
 		global job_fail_msg
 		global debug_printer_socket
+		global logger
 		# DEBUG - supressing json output
 		# print 'PRINTER SOCKET:',
 		# print '\n'.join([l.rstrip() for l in data.splitlines()])
