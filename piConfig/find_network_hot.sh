@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # killall python
-echo connection = $1
+echo attempting reconnect on $1
 while true ; do
    if ifconfig $1 | grep -q "inet addr:" ; then
      # sudo /home/pi/raspi/piConfig/startup_verbose.sh &

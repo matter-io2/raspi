@@ -21,9 +21,11 @@ from twisted.web.iweb import IBodyProducer
 #server = 'http://matter.io/'
 server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 
+debug_internet=False
+debug_server_response=True
+debug_printer_socket=True
+debug_printer_client_socket=True
 debug_webcam=False
-debug_server_response=False
-debug_internet=True
 
 inet_iface=''
 network_name=''
@@ -59,36 +61,38 @@ job_fail_msg = ''
 ip_address = ''
 
 
-##main brain services
-# moderate wifi connection
-# talk to server, parse response, dole out tasks
-# identify printer type
-# webcam photos
-
-
-
+#---main brain services---
+#1) moderate wifi connection
+#2) find printer type (lsusb) and connect when disconnected
+#3) talk to server, parse response, dole out tasks
+#4) webcam - take pic, upload
+#5) check for update, upload job log @ end of each job
 
 def mainBrain():
-#variables I need - 
+	#variables I need - 
 	global inet_iface, lost_packets, pic_count
 	global printer_type, printer_printerId, printer_inUse
 	global pi_id, online, ip_address
+	global debug_internet
 	
 	status='done'
-	#INTERNET mediation - user print to debug
-	print '\n----INTERNET mediation----\n'
-	getInetInfo()
+	#1) INTERNET cnx mediation - user print to debug
+	print '\n----INTERNET cnx mediation----\n'
+	getInetInfo(debug_internet)
 	if lost_packets>=6: # no ip addres, reconnect after server timeout
 		reconnectInternet(inet_iface)
 		#should handle hotswapping...
 
-	#PRINTER mediation - user print to debug
+	#2) PRINTER mediation - user print to debug
 	print '\n----PRINTER mediation----\n'
 	if printer_printerId=='':
+		print 'getting printer type from lsusb' #used for timing
 		getPrinterType()
 		print 'printer_type = ', printer_type
 		print 'printer_type_ID = ', printer_type_ID
 		if printer_type=='Makerbot':
+			print 'there is a makerbot usb connected'
+			print 'attempting connect to Makerbot printer'
 			reconnectPrinter()
 		elif printer_type=='Ultimaker':
 			print 'start ultimaker pinger'
@@ -96,21 +100,22 @@ def mainBrain():
 			print 'start LulzBot/reprap pinger'
 		req_type='pi'
 	else:
+		print 'printer connected, id:',printer_printerId
 		req_type='printer'
 
-
-	#PING SERVER... once ip_address saving is consistent add - if ip_address!=''
-	#ping server with printer or pi info
+	#3) PING SERVER... once ip_address saving is consistent add - if ip_address!=''
+	#	ping server with printer or pi info
 	print '\n----SERVER mediation----\n'
 	makeRequest('printer',status) #status=done
 	#makeRequest(req_type,status) #status=done
 
-	#WEBCAM
+	#4) WEBCAM
 	print '\n----WEBCAM mediation----\n'
 	webcamPic()
 
+	#5) UPDATE AND LOG
 	print '\n----UPDATE mediation----\n'
-	if not printer_inUse and ip_address!='':
+	if job_conclusion!='' and not printer_inUse and ip_address!='': # job just finished, printer's not being used, and we have internet
 		#check for git update
 		arg='/home/pi/raspi/piConfig/update_routine.sh'
 		p_new=subprocess.Popen(arg,shell=True)
@@ -119,28 +124,12 @@ def mainBrain():
 		#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
 
 		#upload last job's log file
-		#makeRequest('log',status) #status=done
+		# makeRequest('log',status) #status=done
 
 	#LOGGING:
 	
 
-
-#----implement--------
-# mainBrain script
-# if wifi lost:   
-# 	reconnect wifi
-# if not connected:
-# 	if lsusb has my printer id...: 
-# 		attempt connect...
-# 	elif lsusb has some other printer id...
-# 		start other printer's pinger script
-# 	else:
-# 		print 'no known printer id's attached
-# if webcam attached
-# 	take webcam photo and post
-#----implement--------
-
-#driver
+#driver (below)
 # contains all low level commands
 # - connect, print, cancel, monitor
 
@@ -166,9 +155,10 @@ def get_pi_id():  #saves raspi's serial # as unique pi_id
 #---------INTERNET subroutines------------
 # From: http://cagewebdev.com/index.php/raspberry-pi-showing-some-system-info-with-a-python-script/
 # saves connection interface and ip address
-def getInetInfo():
+def getInetInfo(debug_output):
 	global ip_address, inet_iface
 	global network_name, link_quality, signal_level, noise_level
+
 	#Returns the current IP address
 	arg='ip route list'
 	p1=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
@@ -183,12 +173,15 @@ def getInetInfo():
 			inet_iface='eth0' #reconnect on ethernet even if it's not in the ip table right now...because it's still plugged in
 		else:  #no ethernet, reconnect on wlan0
 			inet_iface='wlan0'
+
 	else: #internet CNX! - parse data
 		split_ipRoute = data1[0].split()
 		#get interface - doesn't reset until another connection comes online
 		if 'eth0' in split_ipRoute:
+			inet_active = 'active'
 			inet_iface='eth0'
 		elif 'wlan0' in split_ipRoute:
+			inet_active = 'active'
 			inet_iface='wlan0'
 			p3=subprocess.Popen('iwconfig wlan0',shell=True,stdout=subprocess.PIPE)
 			data_wlan0=p3.communicate()
@@ -199,30 +192,38 @@ def getInetInfo():
 		#save lan_ip
 		if 'src' in split_ipRoute:
 			ip_address = split_ipRoute[split_ipRoute.index('src')+1]
-			print 'LAN IP Address:' + str(ip_address)
 		else:
-			print 'no LAN IP address assigned - missing "src" key'
 			ip_address = ''
+
+	if debug_output:
+		if ip_address=='':
+			print "internet interface:",inet_iface
+			print 'no LAN IP address assigned - missing "src" key \n interface is probably inactive'
+		else:
+			print "internet interface:",inet_iface
+			print 'LAN IP Address:' + str(ip_address)
 
 
 #reconnects using sudo ifup [eth0/wlan0]
-def reconnectInternet():
+def reconnectInternet(debug_output):
 		global inet_iface
-		print 'starting bash script to reconnect to wifi'
+		if debug_output: print 'starting bash script to reconnect to wifi'
 		arg = ['bash','/home/pi/raspi/piConfig/find_network_hot.sh',str(inet_iface)] # find_network_hot.sh allows pinger to stay active
 		p=subprocess.Popen(arg)
 		# p.wait()
-		print 'waiting...'
-		p.wait()  # don't do anything until wifi comes back up
-		print 'wait is finished'
+		if debug_output: print 'waiting... not worth doing anything until internet comes back'
+		#reconnect should probably run in the background... might mess up conveyor_service and cause print to fail...
+		p.wait()  # don't do anything until wifi comes back up, 
+		if debug_output: print 'wait is finished'
 		data = p.communicate()
-		print 'printing data from python...\n\n\n'
-		print data
+		if debug_output: print 'printing data from python...\n\n\n'
+		if debug_output: print data
 
 
 #---------PRINTER subroutines------------
 #uses lsusb to get printer make (used to decide which pinger file to use)
 def getPrinterType():
+	#author - Drew Beller
 	global printer_type, printer_type_ID
 	found = False
 	arg='lsusb'
@@ -230,7 +231,7 @@ def getPrinterType():
 	data = p.communicate()
 	split_data = data[0].split()
 	if '23c1:d314' in split_data:
-		printer_type_ID = '23c1:d314' #Makerbot Replicator
+		printer_type_ID = '23c1:d314' #Makerbot Replicator 1
 		printer_type = 'Makerbot'
 		found = True
 	elif '23c1:b015' in split_data:
@@ -249,19 +250,21 @@ def getPrinterType():
 		printer_type_ID = split_data[split_data.index('Arduino')-1]
 		printer_type = 'Unknown'
 		found = True
-	else:#returns ID when printer has no name
-		cnt=-1
-		for i in split_data:
-			cnt=cnt+1
-			if (i == 'ID'):
-				if (len(split_data)-1)<(cnt+2):
-					printer_type_ID= split_data[cnt+1]
-					printer_type= "Unknown"
-					found = True
-				elif split_data[cnt+2]=='Bus':
-					printer_type_ID= split_data[cnt+1]
-					printer_type= "Unknown"
-					found = True
+	#Drew should explain this part to Greg
+	#not sure what this does, 
+	# else:#returns ID when printer has no name
+	# 	cnt=-1
+	# 	for i in split_data:
+	# 		cnt=cnt+1
+	# 		if (i == 'ID'):
+	# 			if (len(split_data)-1)<(cnt+2):
+	# 				printer_type_ID= split_data[cnt+1]
+	# 				printer_type= "Unknown"
+	# 				found = True
+	# 			elif split_data[cnt+2]=='Bus':
+	# 				printer_type_ID= split_data[cnt+1]
+	# 				printer_type= "Unknown"
+	# 				found = True
 	if printer_type=='Unknown':
 		print 'Not a Recognized Printer \n RepRaps may still work'
 	if found==False:
@@ -283,23 +286,26 @@ def webcamPic():
 	global server, pic_count
 	global printer_printerId, pi_id
 	global debug_webcam
-	print '\n\n\n --------starting webcam_routine call-------- \n\n\n'
-	print 'printer id = ',printer_printerId
 	address = server+'webcamUpload'
-	print 'address for post', address
+	if debug_webcam:
+		print '\n\n\n --------starting webcam_routine call-------- \n\n\n'
+		print 'address for post', address
+		print 'printer id = ',printer_printerId
 	if printer_printerId == '': #no printerId, use pi_id
 		#arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(pi_id),str(pic_count)]
 		pass # do nothing if there is no printer_id
 	else:
 		arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count),str(debug_webcam)]
-		p=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
+		p_webcam=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 	pic_count = pic_count +1
-	print '\n\n\n --------webcam_routine call executing now-------- \n\n\n'
+	if debug_webcam:
+		print '\n\n\n --------webcam_routine called-------- \n\n\n'
 
 
 #---------SERVER subroutines-----------
 #http POST to website - also 
 def makeRequest(req_type,status):
+	global debug_server_response
 	global printer_type, printer_type_ID,printer_profile, printer_firmware, printer_printerId, printer_inUse, online
 	global printer_tool1_temp, printer_tool2_temp, printer_bed_temp
 
@@ -313,63 +319,72 @@ def makeRequest(req_type,status):
 	print 'upload address = ',address
 
 	if req_type=='printer':
-		print 'sending printer data -- printer id is present'
-	# debugger that shows what is being posted to the server (see agent.request for actual posting)	
-		print 'Data Sent:',urllib.urlencode({'type':'update',
-							'packet_type':req_type,											
-							'online':online,
-							'ipAddress':ip_address,
-							'printer_profile':printer_profile,
-							'printer_firmware':printer_firmware,
-							'printer_printerId':printer_printerId,
-							'printer_inUse':printer_inUse,
-							'printer_tool1_temp':printer_tool1_temp,
-							'printer_tool2_temp':printer_tool2_temp,
-							'printer_bed_temp':printer_bed_temp,
-							'pi_id':pi_id,
-							'job_id':job_id,
-							'job_process':job_process,
-							'job_progress':job_progress,
-							'job_conclusion':job_conclusion,
-							'job_fail_msg':job_fail_msg,
-							'status':status})
+		if debug_server_response:
+			# debugger that shows what is being posted to the server (see agent.request for actual posting)	
+			print 'sending printer data -- printer id is present'
+			print 'Data Sent:',urllib.urlencode({'type':'update',
+												'packet_type':req_type,											
+												'online':online,
+												'ipAddress':ip_address,
+												'printer_profile':printer_profile,
+												'printer_firmware':printer_firmware,
+												'printer_printerId':printer_printerId,
+												'printer_inUse':printer_inUse,
+												'printer_tool1_temp':printer_tool1_temp,
+												'printer_tool2_temp':printer_tool2_temp,
+												'printer_bed_temp':printer_bed_temp,
+												'pi_id':pi_id,
+												'job_id':job_id,
+												'job_process':job_process,
+												'job_progress':job_progress,
+												'job_conclusion':job_conclusion,
+												'job_fail_msg':job_fail_msg,
+												'status':status})
 
 	# posts information to server
 		d = agent.request(	'POST',
 							address,
 							Headers({'Content-Type': ['application/x-www-form-urlencoded']}),
 							StringProducer(urllib.urlencode({'type':'update',
-							'packet_type':req_type,
-							'online':online,
-							'ipAddress':ip_address,
-							'printer_profile':printer_profile,
-							'printer_firmware':printer_firmware,
-							'printer_printerId':printer_printerId,
-							'printer_inUse':printer_inUse,
-							'printer_tool1_temp':printer_tool1_temp,
-							'printer_tool2_temp':printer_tool2_temp,
-							'printer_bed_temp':printer_bed_temp,
-							'pi_id':pi_id,
-							'job_id':job_id,
-							'job_process':job_process,
-							'job_progress':job_progress,
-							'job_conclusion':job_conclusion,
-							'job_fail_msg':job_fail_msg,
-							'status':status}))
-					)
+												'packet_type':req_type,
+												'online':online,
+												'ipAddress':ip_address,
+												'printer_profile':printer_profile,
+												'printer_firmware':printer_firmware,
+												'printer_printerId':printer_printerId,
+												'printer_inUse':printer_inUse,
+												'printer_tool1_temp':printer_tool1_temp,
+												'printer_tool2_temp':printer_tool2_temp,
+												'printer_bed_temp':printer_bed_temp,
+												'pi_id':pi_id,
+												'job_id':job_id,
+												'job_process':job_process,
+												'job_progress':job_progress,
+												'job_conclusion':job_conclusion,
+												'job_fail_msg':job_fail_msg,
+												'status':status}))
+						)
 	elif req_type=='pi':
-		print 'sending pi data -- no printer id'
-	# debugger that shows what is being posted to the server (see agent.request for actual posting)	
-		print 'Data Sent:',urllib.urlencode({'type':'update',
-
-															'status':status})
+		if debug_server_response:
+		# debugger that shows what is being posted to the server (see agent.request for actual posting)	
+			print 'sending pi data -- no printer id'
+			print 'Data Sent:',urllib.urlencode({'type':'update',
+																'pi_id':pi_id,
+																'online':online,
+																'ipAddress':ip_address,
+																'network_type':inet_iface,															
+																'network_name':network_name,
+																'link_quality':link_quality,
+																'signal_level':signal_level,
+																'noise_level':noise_level,
+																'status':status})
 	# posts information to server
 		d = agent.request(	'POST',
 							address,
 							Headers({'Content-Type': ['application/x-www-form-urlencoded']}),
 							StringProducer(urllib.urlencode({'type':'update',
-															'online':online,
 															'pi_id':pi_id,
+															'online':online,
 															'ipAddress':ip_address,
 															'network_type':inet_iface,															
 															'network_name':network_name,
@@ -377,34 +392,17 @@ def makeRequest(req_type,status):
 															'signal_level':signal_level,
 															'noise_level':noise_level,
 															'status':status}))
-					)
+						)
 	elif req_type=='log':
-		d = agent.request(	'POST',
-							address,
-							Headers({'Content-Type': ['application/x-www-form-urlencoded']}),
-							StringProducer(urllib.urlencode({'type':'update',
-							'packet_type':req_type,
-							'online':online,
-							'ipAddress':ip_address,
-							'printer_profile':printer_profile,
-							'printer_firmware':printer_firmware,
-							'printer_printerId':printer_printerId,
-							'printer_inUse':printer_inUse,
-							'printer_tool1_temp':printer_tool1_temp,
-							'printer_tool2_temp':printer_tool2_temp,
-							'printer_bed_temp':printer_bed_temp,
-							'pi_id':pi_id,
-							'job_id':job_id,
-							'job_process':job_process,
-							'job_progress':job_progress,
-							'job_conclusion':job_conclusion,
-							'job_fail_msg':job_fail_msg,
-							'status':status}))
-					)
+		address = server+'logUpload'
+		arg = ['/home/pi/raspi/pinger/log_upload.sh',address,str(job_id)]
+		p_job_log=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 
+		# curl -F "file=@/dev/shm/$2_$3.jpg;filename=$2_$3.jpg" -m 15 address
 
-	print 'Request Sent' # debug output
-	print 'lost packet num =', str(lost_packets)
+	if debug_server_response:
+		print 'Request Sent' # debug output
+		print 'lost packet num =', str(lost_packets)
 	lost_packets = lost_packets+1
 
 	# adds next method to polling
@@ -421,8 +419,9 @@ def makeRequest(req_type,status):
 
 #data sent back from server
 def cbRequest(response, cookieJar):
-	global lost_packets
-	print 'Response Code:', response.code
+	global lost_packets, debug_server_response
+	if debug_server_response:
+		print 'Response Code:', response.code
 	lost_packets = 0
 
 	headersDict = {}
@@ -442,7 +441,6 @@ def cbRequest(response, cookieJar):
 	return response
 
 cancelCmdTime = time()
-
 #parses json string from server
 def parseJSON(bodyString):
 	global printer_inUse, job_process, job_progress, job_conclusion, job_num, job_id
@@ -478,6 +476,7 @@ def parseJSON(bodyString):
 			makeCmdlineReq('hello')  # handshake!  
 			makeCmdlineReq('canceljob',{'id':job_num})  # kills job [id]
 			job_num = -1 # important to say new job has not yet been added 
+			cancelCmdTime=time()
 			# makeCmdlineReq('hello')  # handshake!  
 			# makeCmdlineReq('getjob',{'id':job_num})  # kills job [id]		
 	#print gcode if there is a url 
@@ -516,14 +515,11 @@ def printFile(fileName):
 #LIGHTS - fLASH GREEN WHEN GOING
 
 def print500Response(bodyString):
-	
 	print 'error 500!!! saved log out to Desktop'
 	#print bodyString
-
 	text_file = open("/home/pi/Desktop/error.html", "w")
 	text_file.write("%s"%bodyString)
 	text_file.close()
-
 
 #----------------------------------/\------------------------------------#
 #----------------------------------||------------------------------------#
@@ -557,12 +553,12 @@ class StringProducer(object):
 class BeginningPrinter(Protocol):
 	def __init__(self, finished,remaining):
 		self.finished = finished
-#		self.remaining = remaining
+		# self.remaining = remaining
 		self.display = ''
 	def dataReceived(self, bytes):
-#		if self.remaining:
+		# if self.remaining:
 			self.display += bytes
-#			self.remaining -= len(bytes[:self.remaining])
+			# self.remaining -= len(bytes[:self.remaining])
 
 	def connectionLost(self, reason):
 		if reason.getErrorMessage().startswith('Response body fully received'):
@@ -573,6 +569,7 @@ class BeginningPrinter(Protocol):
 
 
 def makeCmdlineReq(cmd,params = {}):
+	global debug_printer_client_socket
 	unixEndPoint = endpoints.UNIXClientEndpoint(reactor, '/home/pi/raspi/makerbot/conveyor/conveyord.socket')
 	#READ ONLY TEST
 	# unixEndPoint = endpoints.UNIXClientEndpoint(reactor, '/tmp/makerbot/conveyord.socket')
@@ -581,12 +578,14 @@ def makeCmdlineReq(cmd,params = {}):
 	newCmdReq.cmd = cmd
 	newCmdReq.params = params
 	unixEndPoint.connect(newCmdReq)
-	print cmd
-	print params
+	if debug_printer_client_socket:
+		print cmd
+		print params
 
 global currentCommand
 class CmdlineReqProtocol(Protocol):
 	def connectionMade(self):
+		global debug_printer_client_socket
 		global currentCommand
 		self.cmd = self.factory.cmd
 		self.params = self.factory.params
@@ -599,16 +598,19 @@ class CmdlineReqProtocol(Protocol):
 		outDict['jsonrpc'] = '2.0'
 		outDict['method'] = self.cmd
 		currentCommand = self.cmd
-		print 'current command is',currentCommand
+		if debug_printer_client_socket: 
+			print 'current command is',currentCommand
 
 		self.transport.write(json.dumps(outDict))
 
 	def dataReceived(self,data):
+		global debug_printer_client_socket
 		global currentCommand
 		global printer_profile, printer_firmware, printer_printerId, printer_inUse, online
-		print 'CmdLineReq Received:',data
+		if debug_printer_client_socket:
+			print 'CmdLineReq Received:',data
 
-# add data stream parser
+		#parse multiple json packets into individual packets
 		if '}{' in data:
 			parsed = True
 			# print '\n\n splitting data \n\n'
@@ -624,10 +626,8 @@ class CmdlineReqProtocol(Protocol):
 		else:
 			data = [data]
 
-			# data = [data_array[0]+'"}' , '{' + data_array[1]]  #save only first data chunk
-
 		for msg in data:
-			print 'unpacking msg from cmdlineReq'
+			if debug_printer_client_socket: print 'unpacking msg from cmdlineReq'
 			cmdResponseData = json.loads(msg)
 			if cmdResponseData.has_key('error'):
 				print 'error while executing ', currentCommand
@@ -643,10 +643,10 @@ class CmdlineReqProtocol(Protocol):
 			elif cmdResponseData.has_key('result'):
 				online = True
 				if cmdResponseData['id'] == 1:  # this works for everything but print [file] where the print function is id=2 (3rd cmd)
-					print 'response id = 1, unpacking info'
-					print currentCommand
+					if debug_printer_client_socket:
+						print 'response id = 1, unpacking info'
+						print currentCommand
 					if currentCommand == 'connect':
-						print 'printer recognized, saving information'
 						printer_profile = cmdResponseData['result']['profile_name']
 						printer_firmware = cmdResponseData['result']['firmware_version']
 						printer_printerId = cmdResponseData['result']['name'].split(':')[-1]
@@ -654,11 +654,13 @@ class CmdlineReqProtocol(Protocol):
 						if printer_profile == 'Replicator2X':
 							printer_bed_temp = cmdResponseData['result']['temperature']['heated_platforms']['0']
 							printer_tool2_temp = cmdResponseData['result']['temperature']['tools']['1'] # 2nd tool
-						print 'printer:'
-						print '\tprofile\t\t', printer_profile
-						print '\tfirmware \t', printer_firmware
-						print '\tid\t\t', printer_printerId
-						print '\textruder Temp\t', printer_tool1_temp
+						if debug_printer_client_socket:
+							print 'printer recognized, saving information'
+							print 'printer:'
+							print '\tprofile\t\t', printer_profile
+							print '\tfirmware \t', printer_firmware
+							print '\tid\t\t', printer_printerId
+							print '\textruder Temp\t', printer_tool1_temp
 
 					elif currentCommand == 'canceljob': # following cancel command
 						#think job was canceled
@@ -676,7 +678,8 @@ class CmdlineReqProtocol(Protocol):
 					currentCommand = ''
 
 			else:
-				print '\n\n\n\n\n\n Unknown response to command - did not contain "error" or "result" keys \n\n\n\n\n\n'
+				if debug_printer_client_socket:
+					print '\n\n\n\n\n\n Unknown response to command - did not contain "error" or "result" keys \n\n\n\n\n\n'
 
 
 
@@ -700,7 +703,7 @@ class UnixSocketProtocol(Protocol):
 		global job_filename, job_process, job_progress, job_conclusion, job_num
 		global pi_id
 		global job_fail_msg
-
+		global debug_printer_socket
 		# DEBUG - supressing json output
 		# print 'PRINTER SOCKET:',
 		# print '\n'.join([l.rstrip() for l in data.splitlines()])
@@ -732,7 +735,7 @@ class UnixSocketProtocol(Protocol):
 			printerData = json.loads(msg)
 			# else:
 			# 	printerData = json.loads(data)
-			print msg
+			if debug_printer_socket: print msg
 			if not printerData.has_key('method'):
 				return
 			if printerData['method'] == 'jobadded':
@@ -747,8 +750,7 @@ class UnixSocketProtocol(Protocol):
 				if job_num == printerData['params']['id']:
 					# doesn't need to be saved... because they match!
 					# job_num = printerData['params']['id']
-					print '\nDEBUG'
-					print 'job_num matched - saving data\n'
+					if debug_printer_socket: print '\n\n----job_num matched----\nsaving data\n\n'
 
 					if printerData['params']['state'] == 'RUNNING':
 						printer_inUse = True
@@ -763,14 +765,14 @@ class UnixSocketProtocol(Protocol):
 						# 	else:
 						# 		job_process = ''
 					elif printerData['params']['state'] == 'STOPPED':
-						print '\n job state STOPPED \N'
+						if debug_printer_socket: print '\n job state STOPPED \N'
 						job_conclusion = printerData['params']['conclusion']
 						printer_inUse = False
 						if printerData['params']['failure']:
 							if printerData['params']['failure'].has_key('exception') and printerData['params']['failure']['exception'].has_key('message'):
 								job_fail_msg = printerData['params']['failure']['exception']['message']
 				else:
-					print '\njob_num mismatch - not saving any info\n'
+					if debug_printer_socket: print '\n\n----job_num mismatch----\nnot saving any info\n\n'
 
 			elif printerData['method'] == 'machine_state_changed':
 			# get printerId, firmware, profile
@@ -815,20 +817,21 @@ class UnixSocketProtocol(Protocol):
 
 		# if printerData['method'] != 'port_detached' and printerData['method']!='machine_state_changed':
 		# 	online = True
-		print '\nmethod =',printerData['method']
-		print 'print job update:'
-		print '\tfilename:\t\t',job_filename
-		print '\tJob ID:\t\t',job_id
-		print '\tJob num:\t',job_num		
-		print '\tPrinter In Use:\t',printer_inUse
-		print '\tTool Temp:\t',printer_tool1_temp
-		print '\tprocess:\t',job_process
-		print '\tprogress:\t',job_progress,'%'
-		print '\tconclusion:\t', job_conclusion
-		if job_fail_msg != '':
-			print '\tfailure message\t', job_fail_msg
-		print 'Debug:'
-		print '\tjob_started:\t', job_started
+		if debug_printer_socket: 
+			print '\nmethod =',printerData['method']
+			print 'print job update:'
+			print '\tfilename:\t\t',job_filename
+			print '\tJob ID:\t\t',job_id
+			print '\tJob num:\t',job_num		
+			print '\tPrinter In Use:\t',printer_inUse
+			print '\tTool Temp:\t',printer_tool1_temp
+			print '\tprocess:\t',job_process
+			print '\tprogress:\t',job_progress,'%'
+			print '\tconclusion:\t', job_conclusion
+			if job_fail_msg != '':
+				print '\tfailure message\t', job_fail_msg
+			print 'Debug:'
+			print '\tjob_started:\t', job_started
 
 class UnixSocketFactory(Factory):
 	protocol = UnixSocketProtocol
@@ -857,13 +860,13 @@ if __name__ == '__main__':
 	cookieJar = CookieJar()
 	agent = CookieAgent(Agent(reactor), cookieJar)
 	status = 'done'
-#	l = task.LoopingCall(makeRequest,status) #talks to server
+	# l = task.LoopingCall(makeRequest,status) #talks to server
 	#jsonDebug
 	#disable this to stop posting and receiving info to/from the website
-#	l.start(5)
+	# l.start(5)
 	print 'Reactor Started'
-#	f = task.LoopingCall(findPrinter_and_Ip)
-#	f.start(5)
+	# f = task.LoopingCall(findPrinter_and_Ip)
+	# f.start(5)
 
 	f = task.LoopingCall(mainBrain)
 	f.start(5)

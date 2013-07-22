@@ -28,7 +28,6 @@ then
 	#fswebcam -r 640x480 -S 8 -d /dev/video0 --jpeg 95 --save /dev/shm/$2.jpg
 	fswebcam -c fswebcam.conf --save /dev/shm/$2_$3.jpg  #loads options that are in /raspi/pinger folder
 
-
 	echo "starting http post"
 	#matter server
 	#curl -F "file=@/dev/shm/$2_$3.jpg;filename=$2_$3.jpg" -m 15 http://matter.io/webcamUpload
