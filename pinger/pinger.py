@@ -39,7 +39,8 @@ noise_level=''
 lost_packets = 0
 pic_count = 0
 
-printer_type=''
+# printer_type=''
+printer_type='Makerbot'
 printer_type_ID=''
 
 printer_profile = 0
@@ -83,9 +84,9 @@ def mainBrain():
 
 	#1) INTERNET cnx mediation - user print to debug
 	print '\n----INTERNET cnx mediation---- (',debug_internet,')\n'
-	getInetInfo()
+#	getInetInfo()
 	if lost_packets>=6: # no ip addres, reconnect after server timeout
-		reconnectInternet(inet_iface)
+#		reconnectInternet(inet_iface)
 		#should handle hotswapping...
 
 	#2) PRINTER mediation - user print to debug
@@ -116,7 +117,7 @@ def mainBrain():
 
 	#4) WEBCAM
 	print '\n----WEBCAM mediation----(debug=',debug_webcam,')\n'
-	webcamPic()
+#	webcamPic()
 
 	#5) UPDATE AND LOG UPLOAD
 	print '\n----UPDATE mediation----\n'
@@ -138,7 +139,7 @@ def mainBrain():
 
 				#upload last job's log file
 				#LOG UPLOAD
-				makeRequest('log',status) #status=done
+#				makeRequest('log',status) #status=done
 		
 				update_and_log=True
 	print 'update/log finished'
