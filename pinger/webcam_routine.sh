@@ -18,7 +18,7 @@ then
 	if [ "$3" -eq "1" ]
 	then
 		#clear everything when pinger starts
-		sudo rm /dev/shm/*
+		sudo rm /dev/shm/*.jpg
 	else
 		echo 'clearing /dev/shm'
 		sudo rm /dev/shm/$2_$old_pic.jpg # clear ram to prevent taking too much space
