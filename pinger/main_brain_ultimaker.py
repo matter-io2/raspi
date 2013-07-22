@@ -505,6 +505,8 @@ def printFile(fileName):
 		###########################^this should probably be done server side
 		pron.p.startprint(gcode) #calls method in printcore through pronsole only takes arrays
 		#while printing
+		#M105 - Read current temp
+		#M117 - display message
 		#	line=pron.p._readline()
 #LIGHTS - fLASH GREEN WHEN GOING
 
