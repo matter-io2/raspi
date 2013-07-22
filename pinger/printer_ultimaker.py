@@ -1,15 +1,12 @@
 #import Printrun Stuff
-import Printrun.printcore as printcore
-import Printrun.pronsole as pronsole
-from Printrun.printrun.printrun_utils import install_locale
-from Printrun.printrun import gcoder
+import printcore
+import pronsole
+from printrun.printrun_utils import install_locale
+from printrun import gcoder
 install_locale('pronterface')
 
-from Printrun.printrun.GCodeAnalyzer import GCodeAnalyzer
-from Printrun.printrun import gcoder
-
-import thread
-from threading import Thread
+from printrun.GCodeAnalyzer import GCodeAnalyzer
+from printrun import gcoder
 
 
 class printer():
