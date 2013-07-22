@@ -159,6 +159,7 @@ def get_ipaddress():
 		ip_address = ''
 		reconnect_wifi()
 def get_pi_id():  #saves raspi's serial # as unique pi_id
+	#May set this as ID for RepRaps, but limits hot swappability from reprap to reprap
 	global pi_id
 	arg='cat /proc/cpuinfo'
 	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
