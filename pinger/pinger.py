@@ -22,7 +22,7 @@ from twisted.web.iweb import IBodyProducer
 server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 
 logPath = '/home/pi/raspi/pinger/pinger.log'
-logger = logging.getLogger(logName)		#log name
+logger = logging.getLogger('pingerLog')	#log name
 
 debug_internet=False
 debug_server_response=True
@@ -157,11 +157,12 @@ def initialize(): #startup script, only run once at beginning, run here because 
 
 	get_pi_id()
 	getInetInfo()
-	setupLog(logPath, 'pingerLog')
+	setupLog(logPath)
 
 # http://docs.python.org/2/library/logging.html
-def setupLog(filepath, logName):
-	import logger
+def setupLog(filepath):
+	global logger
+	
 	hdlr = logging.FileHandler(filepath)	#i.e. '/var/tmp/myapp.log'
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 	hdlr.setFormatter(formatter)
@@ -205,8 +206,7 @@ def getInetInfo():
 		#see if ethernet cable is physically connected
 		p2=subprocess.Popen('cat /sys/class/net/eth0/carrier',shell=True,stdout=subprocess.PIPE)
 		data_eth=p2.communicate()
-
-		if bool(data_eth[0][0]): #tells me whether ethernet is connected or not 1=connected, 0=not connected
+		if bool(int(data_eth[0][0])): #tells me whether ethernet is connected or not 1=connected, 0=not connected
 			#ethernet is still attached, try to reconnect to eth0!
 			inet_iface='eth0' #reconnect on ethernet even if it's not in the ip table right now...because it's still plugged in
 		else:  #no ethernet, reconnect on wlan0
@@ -496,11 +496,11 @@ def parseJSON(bodyString):
 		# job_ids match!
 			if bodyDict.has_key('job_cancelCmd') and bodyDict['job_cancelCmd'] == True and printer_inUse:
 				print '\n\nAttempting cancel for current job via job_cancelCmd \n\n'
-				logger.WARNING('Cancel Job - command from server for job_id:%s job_num:%s',str(job_id),str(job_num))
+				logger.warning('Cancel Job - command from server for job_id:%s job_num:%s',str(job_id),str(job_num))
 				job_cancel = True
 		else:
 		#new job_id don't match or
-			logger.WARNING('Cancel Job - Attempting cancel JOB_IDs DO NOT MATCH - job_id:%s job_num:%s',str(job_id),str(job_num))
+			logger.warning('Cancel Job - Attempting cancel JOB_IDs DO NOT MATCH - job_id:%s job_num:%s',str(job_id),str(job_num))
 			job_id = bodyDict['job_id']
 			job_process = 'idle'
 			job_progress = 0
@@ -515,7 +515,7 @@ def parseJSON(bodyString):
 	else: #no job_id key
 		if printer_inUse:
 			print '\n\n\n\n\nprinter in use w/ no job_id from server... \n THIS SHOULD NEVER HAPPEN!!!\n\n\n\n'
-			logger.WARNING('Cancel Job - printer in use w/ no job_id saved from server... this should never happen - noJobIdcount=%s',str(no_job_id_count))
+			logger.warning('Cancel Job - printer in use w/ no job_id saved from server... this should never happen - noJobIdcount=%s',str(no_job_id_count))
 			no_job_id_key_count = no_job_id_key_count+1
 			if no_job_id_key_count>6: #prevents cancel from stray job cancels
 				job_cancel = True
@@ -525,12 +525,12 @@ def parseJSON(bodyString):
 	if job_cancel and int(job_num) >= 0:
 		dif = time()-cancelCmdTime
 		if int(dif) > 10: # timeout... not sure if it's working
-			logger.WARNING('bodyDict on cancel = %s'+str(bodyDict))
+			logger.warning('bodyDict on cancel = %s'+str(bodyDict))
 			makeCmdlineReq('hello')  # handshake!  
 			makeCmdlineReq('canceljob',{'id':job_num})  # kills job [id]
 			job_num = -1 # important to say new job has not yet been added 
 			cancelCmdTime=time()
-			logger.WARNING(str(bodyDict))
+			logger.warning(str(bodyDict))
 			# makeCmdlineReq('hello')  # handshake!  
 			# makeCmdlineReq('getjob',{'id':job_num})  # kills job [id]		
 	#print gcode if there is a url 
@@ -553,10 +553,10 @@ def downloadFile(url):
 
 	job_filename = url.split('/')[-1]
 	if url != None:
-		logger.INFO('download %s started',str(url))
+		logger.info('download %s started',str(url))
 		d = dl.downloadFile(url,agent)
-		logger.INFO('download %s finished',str(url))
-		logger.INFO('print cmd called')
+		logger.info('download %s finished',str(url))
+		logger.info('print cmd called')
 		d.addCallback(printFile)
 
 
@@ -573,7 +573,7 @@ def printFile(fileName):
 				slicer = "skeinforge"
 	#print file in printer.py
 	p.printFile(fileName,slicer)
-	logger.INFO('print started - %s ',str(filename))
+	logger.info('print started - %s ',str(filename))
 
 #LIGHTS - fLASH GREEN WHEN GOING
 
@@ -831,16 +831,16 @@ class UnixSocketProtocol(Protocol):
 						job_conclusion = printerData['params']['conclusion']
 						printer_inUse = False
 						if debug_printer_socket: print '\n job state STOPPED \N'
-						logger.WARNING('job STOPPED')
-						logger.WARNING('job conclusion: %s',job_conclusion)
+						logger.warning('job STOPPED')
+						logger.warning('job conclusion: %s',job_conclusion)
 
 						if printerData['params']['failure']:
 							if printerData['params']['failure'].has_key('exception') and printerData['params']['failure']['exception'].has_key('message'):
 								job_fail_msg = printerData['params']['failure']['exception']['message']
-								logger.WARNING('job failed, error msg: %s', job_fail_msg)
+								logger.warning('job failed, error msg: %s', job_fail_msg)
 				else:
 					if debug_printer_socket: print '\n\n----job_num mismatch----\nnot saving any info\n\n'
-					logger.WARNING('job num mismatch, job_id_current %s', job_id)
+					logger.warning('job num mismatch, job_id_current %s', job_id)
 
 
 			elif printerData['method'] == 'machine_state_changed':
