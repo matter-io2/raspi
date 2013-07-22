@@ -24,7 +24,7 @@ server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 logPath = '/home/pi/raspi/pinger/pinger.log'
 logger = logging.getLogger('pingerLog')	#log name
 
-debug_internet=False
+debug_internet=True
 debug_server_response=False
 debug_printer_socket=False
 debug_printer_client_socket=False
@@ -446,7 +446,7 @@ def makeRequest(req_type,status):
 						)
 	elif req_type=='log':
 		address = server+'piLogUpload'
-		arg = ['/home/pi/raspi/pinger/log_upload.sh',address,str(logPath),str(job_id)]
+		arg = ['/home/pi/raspi/pinger/log_upload.sh',str(address),str(logPath),str(job_id)]
 		p_job_log=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 
 		# curl -F "file=@/dev/shm/$2_$3.jpg;filename=$2_$3.jpg" -m 15 address

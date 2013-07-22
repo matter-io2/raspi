@@ -7,7 +7,7 @@ echo server_address = $1
 echo logPath = $2
 echo job_id passed = $3,
 curl -F "file=@$2;filename=$3.log" -m 15 $1
-sudo rm /dev/shm/log.log
+#sudo rm /home/pi/raspi/pinger/pinger.log
 
 #curl reference
 #http://curl.haxx.se/docs/manpage.html#-F
