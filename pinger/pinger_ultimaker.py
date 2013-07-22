@@ -382,7 +382,6 @@ def findPrinter_and_Ip():
 			print('M105: '+line)#should get temperatures
 			if (line != None) and (line != ''):#if its connected
 			 	online = True
-			 	break
 		# pron.p.send('M117')#useless
 		# while True:
 		# 	line=pron.p._readline()
