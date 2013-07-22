@@ -361,7 +361,7 @@ def findPrinter_and_Ip():
 			#^need to parse
 			if (line == None) or (line == ''):
 				break
-			print (line)
+			#print (line)
 			#Ultimaker only send back an ID when it wants :(
 			if line.find('echo: External',0,len(line)) != -1:
 				(before,sep,after)=line.partition('-')
@@ -377,13 +377,13 @@ def findPrinter_and_Ip():
 
 		print "!!new printerId", printer_printerId
 		pron.p.send('M105')
-		while True:
-			line=pron.p._readline()
-			print('M105: '+line)#should get temperatures
-			if (line != None) and (line != ''):#if its connected
-			 	online = True
-			 	break
-		pron.p.send('M117')#not useful
+		# while True:
+		# 	line=pron.p._readline()
+		# 	print('M105: '+line)#should get temperatures
+		# 	if (line != None) and (line != ''):#if its connected
+		# 	 	online = True
+		# 	 	break
+		pron.p.send('M117')#sends back ID
 		while True:
 			line=pron.p._readline()
 			print('M117: '+line)
