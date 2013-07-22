@@ -1,8 +1,8 @@
 #import Printrun Stuff
-import printcore
-import pronsole
+import printcore from Printrun
+import pronsole from Printrun
 from printrun.printrun_utils import install_locale
-from printrun import gcoder
+from Printrun import gcoder
 install_locale('pronterface')
 
 from printrun.GCodeAnalyzer import GCodeAnalyzer
