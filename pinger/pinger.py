@@ -26,8 +26,8 @@ logger = logging.getLogger(logName)		#log name
 
 debug_internet=False
 debug_server_response=True
-debug_printer_socket=True
-debug_printer_client_socket=True
+debug_printer_socket=False
+debug_printer_client_socket=False
 debug_webcam=False
 
 inet_iface=''
@@ -517,7 +517,7 @@ def parseJSON(bodyString):
 			print '\n\n\n\n\nprinter in use w/ no job_id from server... \n THIS SHOULD NEVER HAPPEN!!!\n\n\n\n'
 			logger.WARNING('Cancel Job - printer in use w/ no job_id saved from server... this should never happen - noJobIdcount=%s',str(no_job_id_count))
 			no_job_id_key_count = no_job_id_key_count+1
-			if no_job_id_key_count>6 #prevents cancel from stray job cancels
+			if no_job_id_key_count>6: #prevents cancel from stray job cancels
 				job_cancel = True
 	#new features
 	# - working timeout (cancelCmdTime set when cmd is called)
