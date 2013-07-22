@@ -500,7 +500,13 @@ def parseJSON(bodyString):
 				job_cancel = True
 		else:
 		#new job_id don't match or
-			logger.warning('Cancel Job - Attempting cancel JOB_IDs DO NOT MATCH - job_id:%s job_num:%s',str(job_id),str(job_num))
+			logger.warning('Cancel Job - Attempting cancel JOB_IDs DO NOT MATCH')
+			logger.warning('old_job_id:%s job_num:%s ... attempting cancel',str(job_id),str(job_num))
+			logger.warning('new_job_id:%s ',str(bodyDict['job_id']))
+			print '\n\nAttempting cancel JOB_IDs DO NOT MATCH \n\n'
+			print 'old_job_id:',str(job_id),' job_num:',str(job_num),' ... attempting cancel'
+			print 'new_job_id:',str(bodyDict['job_id'])
+			
 			job_id = bodyDict['job_id']
 			job_process = 'idle'
 			job_progress = 0
@@ -509,7 +515,6 @@ def parseJSON(bodyString):
 			#need to keep job_num for cancel command
 			if job_id != '': # not intial value
 				#delete current job
-				print '\n\nAttempting cancel JOB_IDs DO NOT MATCH \n\n'
 				job_cancel = True
 		#Cancel job (currentJob or previous job that was left running)
 	else: #no job_id key
@@ -573,7 +578,7 @@ def printFile(fileName):
 				slicer = "skeinforge"
 	#print file in printer.py
 	p.printFile(fileName,slicer)
-	logger.info('print started - %s ',str(filename))
+	logger.info('print started - %s ',str(fileName))
 
 #LIGHTS - fLASH GREEN WHEN GOING
 
