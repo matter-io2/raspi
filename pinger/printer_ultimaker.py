@@ -70,11 +70,12 @@ class printer():
 		#technically doesn't end the job but the printer is ready to take a new one
 
 	def get_temp():
-		tmp= None
-		pron.p.send('M105')
-		line=pron.p._readline()
-		split_line = line.split()
-		tmp=str(split_line[1])[2:len(split_time[1])]
+		#right code but doesn't send back consistant shit
+		# tmp= None
+		# pron.p.send('M105')
+		# line=pron.p._readline()
+		# split_line = line.split()
+		# tmp=str(split_line[1])[2:len(split_time[1])]
 
 
 if __name__ == '__main__':

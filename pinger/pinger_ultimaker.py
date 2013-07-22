@@ -376,35 +376,6 @@ def findPrinter_and_Ip():
 			 	break
 
 		print "!!new printerId", printer_printerId
-		#pron.p.send('M105') #OUTPUT: M105: T:24.9 /0.0 B:0.0 /0.0 @:0
-		tmp= None
-		pron.p.send('M105')
-		line=pron.p._readline()
-		print ('line: '+line)
-		split_line = line.split()
-		tmp=split_line[1][2:len(split_line[1])-1]
-		print tmp
-		tmp= None
-		pron.p.send('M105')
-		line=pron.p._readline()
-		print ('line: '+line)
-		split_line = line.split()
-		tmp=split_line[1][2:len(split_line[1])-1]
-		print tmp
-		tmp= None
-		pron.p.send('M105')
-		line=pron.p._readline()
-		print ('line: '+line)
-		split_line = line.split()
-		tmp=split_line[1][2:len(split_line[1])-1]
-		print tmp
-		# pron.p.send('M117')#useless
-		# while True:
-		# 	line=pron.p._readline()
-		# 	print('M117: '+line)
-		# 	if (line != None) and (line != ''):#if its connected
-		# 	 	online = True
-		# 	 	break
 #DREW-end
 
 	if ip_address == '':
