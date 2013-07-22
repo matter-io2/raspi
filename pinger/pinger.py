@@ -74,17 +74,18 @@ def mainBrain():
 	global printer_type, printer_printerId, printer_inUse
 	global pi_id, online, ip_address
 	global debug_internet
+	global debug_internet, debug_server_response, debug_printer_socket, debug_printer_client_socket, debug_webcam
 	
 	status='done'
 	#1) INTERNET cnx mediation - user print to debug
-	print '\n----INTERNET cnx mediation----\n'
-	getInetInfo(debug_internet)
+	print '\n----INTERNET cnx mediation---- (',debug_internet,')\n'
+	getInetInfo()
 	if lost_packets>=6: # no ip addres, reconnect after server timeout
 		reconnectInternet(inet_iface)
 		#should handle hotswapping...
 
 	#2) PRINTER mediation - user print to debug
-	print '\n----PRINTER mediation----\n'
+	print '\n----PRINTER mediation----(debug=',debug_printer_socket,'/',debug_printer_client_socket,')\n'
 	if printer_printerId=='':
 		print 'getting printer type from lsusb' #used for timing
 		getPrinterType()
@@ -105,17 +106,18 @@ def mainBrain():
 
 	#3) PING SERVER... once ip_address saving is consistent add - if ip_address!=''
 	#	ping server with printer or pi info
-	print '\n----SERVER mediation----\n'
+	print '\n----SERVER mediation----(debug=',debug_server_response,')\n'
 	makeRequest('printer',status) #status=done
 	#makeRequest(req_type,status) #status=done
 
 	#4) WEBCAM
-	print '\n----WEBCAM mediation----\n'
+	print '\n----WEBCAM mediation----(debug=',debug_webcam,')\n'
 	webcamPic()
 
 	#5) UPDATE AND LOG
 	print '\n----UPDATE mediation----\n'
 	if job_conclusion!='' and not printer_inUse and ip_address!='': # job just finished, printer's not being used, and we have internet
+		
 		#check for git update
 		arg='/home/pi/raspi/piConfig/update_routine.sh'
 		p_new=subprocess.Popen(arg,shell=True)
@@ -124,8 +126,9 @@ def mainBrain():
 		#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
 
 		#upload last job's log file
-		# makeRequest('log',status) #status=done
-
+		makeRequest('log',status) #status=done
+		
+		update_and_log=True
 	#LOGGING:
 	
 
@@ -155,9 +158,10 @@ def get_pi_id():  #saves raspi's serial # as unique pi_id
 #---------INTERNET subroutines------------
 # From: http://cagewebdev.com/index.php/raspberry-pi-showing-some-system-info-with-a-python-script/
 # saves connection interface and ip address
-def getInetInfo(debug_output):
+def getInetInfo():
 	global ip_address, inet_iface
 	global network_name, link_quality, signal_level, noise_level
+	global debug_internet
 
 	#Returns the current IP address
 	arg='ip route list'
@@ -195,7 +199,7 @@ def getInetInfo(debug_output):
 		else:
 			ip_address = ''
 
-	if debug_output:
+	if debug_internet:
 		if ip_address=='':
 			print "internet interface:",inet_iface
 			print 'no LAN IP address assigned - missing "src" key \n interface is probably inactive'
