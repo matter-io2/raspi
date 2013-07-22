@@ -24,7 +24,7 @@ server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 logPath = '/home/pi/raspi/pinger/pinger.log'
 logger = logging.getLogger('pingerLog')	#log name
 
-debug_internet=True
+debug_internet=False
 debug_server_response=False
 debug_printer_socket=False
 debug_printer_client_socket=False
@@ -131,7 +131,7 @@ def mainBrain():
 				print 'attempting update now'
 				#UPDATE via git
 				arg='/home/pi/raspi/piConfig/update_routine.sh'
-				p_new=subprocess.Popen(arg,shell=True)
+#				p_new=subprocess.Popen(arg,shell=True)
 				#this script runs git fetch and will update branches if there's something new available.
 				# it will also restart the startup script (canceling pinger and conveyor_service)
 				#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
