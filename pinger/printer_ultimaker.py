@@ -5,7 +5,7 @@ from Printrun.printrun.printrun_utils import install_locale
 from Printrun.printrun import gcoder
 install_locale('pronterface')
 
-from Printrun.printrun.GCodeAnalyzer import Printrun.GCodeAnalyzer
+from Printrun.printrun import Printrun.GCodeAnalyzer
 from Printrun.printrun import gcoder
 
 import thread
