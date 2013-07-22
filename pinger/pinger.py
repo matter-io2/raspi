@@ -13,13 +13,15 @@ import simplejson as json
 import os
 import subprocess
 import threading
+import logging
 
 from zope.interface import implements
 from twisted.internet.defer import succeed
 from twisted.web.iweb import IBodyProducer
-
 #server = 'http://matter.io/'
 server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
+
+logPath = '/home/pi/raspi/pinger/pinger.log'
 
 debug_internet=False
 debug_server_response=True
@@ -75,8 +77,8 @@ def mainBrain():
 	global pi_id, online, ip_address
 	global debug_internet
 	global debug_internet, debug_server_response, debug_printer_socket, debug_printer_client_socket, debug_webcam
-	
 	status='done'
+
 	#1) INTERNET cnx mediation - user print to debug
 	print '\n----INTERNET cnx mediation---- (',debug_internet,')\n'
 	getInetInfo()
@@ -114,11 +116,11 @@ def mainBrain():
 	print '\n----WEBCAM mediation----(debug=',debug_webcam,')\n'
 	webcamPic()
 
-	#5) UPDATE AND LOG
+	#5) UPDATE AND LOG UPLOAD
 	print '\n----UPDATE mediation----\n'
 	if job_conclusion!='' and not printer_inUse and ip_address!='': # job just finished, printer's not being used, and we have internet
 		
-		#check for git update
+		#UPDATE via git
 		arg='/home/pi/raspi/piConfig/update_routine.sh'
 		p_new=subprocess.Popen(arg,shell=True)
 		#this script runs git fetch and will update branches if there's something new available.
@@ -126,10 +128,16 @@ def mainBrain():
 		#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
 
 		#upload last job's log file
+		#LOG UPLOAD
 		makeRequest('log',status) #status=done
 		
 		update_and_log=True
 	#LOGGING:
+	#download
+	#printCmd, printExec(state_change)
+	#cancelCmd, cancelExec(state_change to STOPPED)
+	#job_conclusion()
+
 	
 
 #driver (below)
@@ -138,6 +146,7 @@ def mainBrain():
 
 def initialize(): #startup script, only run once at beginning, run here because global variables aren't initialized yet in __main__
 	global debug_internet,debug_server_response,debug_printer_socket,debug_printer_client_socket,debug_webcam
+	global logPath
 	print "----Debug Settings----"
 	print "internet", debug_internet
 	print "server_response", debug_server_response
@@ -147,7 +156,20 @@ def initialize(): #startup script, only run once at beginning, run here because 
 
 	get_pi_id()
 	getInetInfo()
+	setupLog(logPath, 'pingerLog')
 
+# http://docs.python.org/2/library/logging.html
+def setupLog(filepath, logName):
+	logger = logging.getLogger(logName)		#log name
+	hdlr = logging.FileHandler(filepath)	#i.e. '/var/tmp/myapp.log'
+	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+	hdlr.setFormatter(formatter)
+	logger.addHandler(hdlr) 
+	logger.setLevel(logging.INFO)
+
+	#example log messages
+	# logger.error('We have a problem')
+	# logger.info('While this is just chatty')
 
 
 #add real pi_id
@@ -328,7 +350,7 @@ def makeRequest(req_type,status):
 	global server, lost_packets
 	global inet_iface, pic_count
 	global network_name,link_quality,signal_level, noise_level
-
+	global logPath
 	address = server+'printerPing/'	
 	print 'upload address = ',address
 
@@ -408,8 +430,8 @@ def makeRequest(req_type,status):
 															'status':status}))
 						)
 	elif req_type=='log':
-		address = server+'logUpload'
-		arg = ['/home/pi/raspi/pinger/log_upload.sh',address,str(job_id)]
+		address = server+'piLogUpload'
+		arg = ['/home/pi/raspi/pinger/log_upload.sh',address,str(logPath),str(job_id)]
 		p_job_log=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 
 		# curl -F "file=@/dev/shm/$2_$3.jpg;filename=$2_$3.jpg" -m 15 address
@@ -455,42 +477,58 @@ def cbRequest(response, cookieJar):
 	return response
 
 cancelCmdTime = time()
+no_job_id_key_count=0
 #parses json string from server
 def parseJSON(bodyString):
 	global printer_inUse, job_process, job_progress, job_conclusion, job_num, job_id
 	global cancelCmdTime, job_started
+	global no_job_id_key_count
+
+
 	bodyDict = json.loads(bodyString)
 	print bodyDict
 	# this is the Json packet from the server
 	job_cancel = False
 	if bodyDict.has_key('job_id'):
-	# this is the 
 		if bodyDict['job_id'] == job_id:
 		# job_ids match!
 			if bodyDict.has_key('job_cancelCmd') and bodyDict['job_cancelCmd'] == True and printer_inUse:
+				print '\n\nAttempting cancel for current job via job_cancelCmd \n\n'
+				logger.WARNING('Cancel Job - command from server for job_id:%s job_num:%s',str(job_id),str(job_num))
 				job_cancel = True
 		else:
 		#new job_id don't match or
+			logger.WARNING('Cancel Job - Attempting cancel JOB_IDs DO NOT MATCH - job_id:%s job_num:%s',str(job_id),str(job_num))
 			job_id = bodyDict['job_id']
 			job_process = 'idle'
 			job_progress = 0
-			job_conclusion = '' #default value when job has not concluded (used above)
+			job_conclusion = '' #defaults to '' when job has not concluded (used above)
 			job_started = False
 			#need to keep job_num for cancel command
-			if job_id != '': # not nitial value
+			if job_id != '': # not intial value
 				#delete current job
+				print '\n\nAttempting cancel JOB_IDs DO NOT MATCH \n\n'
 				job_cancel = True
 		#Cancel job (currentJob or previous job that was left running)
-	else:
+	else: #no job_id key
 		if printer_inUse:
-			job_cancel = True
+			print '\n\n\n\n\nprinter in use w/ no job_id from server... \n THIS SHOULD NEVER HAPPEN!!!\n\n\n\n'
+			logger.WARNING('Cancel Job - printer in use w/ no job_id saved from server... this should never happen - noJobIdcount=%s',str(no_job_id_count))
+			no_job_id_key_count = no_job_id_key_count+1
+			if no_job_id_key_count>6 #prevents cancel from stray job cancels
+				job_cancel = True
+	#new features
+	# - working timeout (cancelCmdTime set when cmd is called)
+	# - counter on no_job_id_count...
 	if job_cancel and int(job_num) >= 0:
 		dif = time()-cancelCmdTime
 		if int(dif) > 10: # timeout... not sure if it's working
+			logger.WARNING('bodyDict on cancel = %s'+str(bodyDict))
 			makeCmdlineReq('hello')  # handshake!  
 			makeCmdlineReq('canceljob',{'id':job_num})  # kills job [id]
 			job_num = -1 # important to say new job has not yet been added 
 			cancelCmdTime=time()
+			logger.WARNING(str(bodyDict))
 			# makeCmdlineReq('hello')  # handshake!  
 			# makeCmdlineReq('getjob',{'id':job_num})  # kills job [id]		
 	#print gcode if there is a url 
@@ -503,16 +541,21 @@ def parseJSON(bodyString):
 			downloadFile(bodyDict['url'])
 
 
+
 import downloader.downloader as dl
 def downloadFile(url):
 	global job_filename
 	agent = Agent(reactor)
 	print "In Download File:",url
 
-	job_fileName = url.split('/')[-1]
+	job_filename = url.split('/')[-1]
 	if url != None:
+		logger.INFO('download %s started',str(url))
 		d = dl.downloadFile(url,agent)
+		logger.INFO('download %s finished',str(url))
+		logger.INFO('print cmd called')
 		d.addCallback(printFile)
+
 
 import printer.printer as p
 def printFile(fileName):
@@ -526,6 +569,8 @@ def printFile(fileName):
 				slicer = "skeinforge"
 	#print file in printer.py
 	p.printFile(fileName,slicer)
+	logger.INFO('print started - %s ',str(filename))
+
 #LIGHTS - fLASH GREEN WHEN GOING
 
 def print500Response(bodyString):
@@ -714,7 +759,7 @@ class UnixSocketProtocol(Protocol):
 	def dataReceived(self, data):
 		global printer_profile, printer_firmware, printer_printerId, printer_inUse, online
 		global printer_tool1_temp, printer_tool2_temp, printer_bed_temp
-		global job_filename, job_process, job_progress, job_conclusion, job_num
+		global job_filename, job_process, job_progress, job_conclusion, job_num, job_id
 		global pi_id
 		global job_fail_msg
 		global debug_printer_socket
@@ -765,7 +810,6 @@ class UnixSocketProtocol(Protocol):
 					# doesn't need to be saved... because they match!
 					# job_num = printerData['params']['id']
 					if debug_printer_socket: print '\n\n----job_num matched----\nsaving data\n\n'
-
 					if printerData['params']['state'] == 'RUNNING':
 						printer_inUse = True
 						job_process = printerData['params']['progress']['name']
@@ -779,14 +823,20 @@ class UnixSocketProtocol(Protocol):
 						# 	else:
 						# 		job_process = ''
 					elif printerData['params']['state'] == 'STOPPED':
-						if debug_printer_socket: print '\n job state STOPPED \N'
 						job_conclusion = printerData['params']['conclusion']
 						printer_inUse = False
+						if debug_printer_socket: print '\n job state STOPPED \N'
+						logger.WARNING('job STOPPED')
+						logger.WARNING('job conclusion: %s',job_conclusion)
+
 						if printerData['params']['failure']:
 							if printerData['params']['failure'].has_key('exception') and printerData['params']['failure']['exception'].has_key('message'):
 								job_fail_msg = printerData['params']['failure']['exception']['message']
+								logger.WARNING('job failed, error msg: %s', job_fail_msg)
 				else:
 					if debug_printer_socket: print '\n\n----job_num mismatch----\nnot saving any info\n\n'
+					logger.WARNING('job num mismatch, job_id_current %s', job_id)
+
 
 			elif printerData['method'] == 'machine_state_changed':
 			# get printerId, firmware, profile
@@ -808,8 +858,6 @@ class UnixSocketProtocol(Protocol):
 			# measure tool1 temp for all machines - Rep2 and Rep2X
 				if printerData['params']['state'] == 'IDLE':
 					printer_inUse = False
-
-
 				printer_tool1_temp = printerData['params']['temperature']['tools']['0'] #1st tool
 				if printer_profile == 'Replicator2X':
 					printer_bed_temp = printerData['params']['temperature']['heated_platforms']['0']
@@ -873,22 +921,20 @@ if __name__ == '__main__':
 	#setup data connections
 	cookieJar = CookieJar()
 	agent = CookieAgent(Agent(reactor), cookieJar)
-	status = 'done'
-	# l = task.LoopingCall(makeRequest,status) #talks to server
-	#jsonDebug
-	#disable this to stop posting and receiving info to/from the website
-	# l.start(5)
-	print 'Reactor Started'
-	# f = task.LoopingCall(findPrinter_and_Ip)
-	# f.start(5)
 
+	initialize()
+	print 'Reactor Started'
 	f = task.LoopingCall(mainBrain)
 	f.start(5)
-	#webcam routine now called in mainBrain
+
+	# l.start(5)
+	# l = task.LoopingCall(makeRequest,status) #talks to server
+	# l.start(5)
+	# f = task.LoopingCall(findPrinter_and_Ip)
+	# f.start(5)
 	#g = task.LoopingCall(webcam_pic) #takes image and uploads it
 	#g.start(5)
 	#implements unique pi_id - currently saved to tool_temp2 as debugging measure until all pi id's are added, or website can receive them
-	initialize()
 
 	#jsonDebug
 	#turn this OFF to disable passive listening
