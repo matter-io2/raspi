@@ -239,6 +239,8 @@ def printerConnect():
 				break
 			print (line)
 			#Ultimaker only send back an ID when it wants :(
+			#Marlin doesn't set a unique printer ID
+			#not sure what this is
 			if line.find('echo: External',0,len(line)) != -1:
 				(before,sep,after)=line.partition('-')
 				(b,s,a)=after.partition(' ')
@@ -248,7 +250,8 @@ def printerConnect():
 				#this will always tell you when it's connected but comes before the possible ID
 			elif (line != None) and (line != ''):#if its connected
 			 	#printer_printerId = getPrinterID()
-			 	printer_printerID = 'No ID was returned'
+			 	get_pi_id()
+			 	printer_printerID = pi_id
 			 	online = True
 			 	break
 
