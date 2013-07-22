@@ -25,7 +25,7 @@ logPath = '/home/pi/raspi/pinger/pinger.log'
 logger = logging.getLogger('pingerLog')	#log name
 
 debug_internet=False
-debug_server_response=True
+debug_server_response=False
 debug_printer_socket=False
 debug_printer_client_socket=False
 debug_webcam=False
@@ -204,13 +204,16 @@ def getInetInfo():
 	#determine active internet interface - eth0/wlan0
 	if data1[0]=='': #no internet CNX
 		#see if ethernet cable is physically connected
-		p2=subprocess.Popen('cat /sys/class/net/eth0/carrier',shell=True,stdout=subprocess.PIPE)
-		data_eth=p2.communicate()
-		if bool(int(data_eth[0][0])): #tells me whether ethernet is connected or not 1=connected, 0=not connected
-			#ethernet is still attached, try to reconnect to eth0!
-			inet_iface='eth0' #reconnect on ethernet even if it's not in the ip table right now...because it's still plugged in
-		else:  #no ethernet, reconnect on wlan0
-			inet_iface='wlan0'
+		try:	
+			p2=subprocess.Popen('cat /sys/class/net/eth0/carrier',shell=True,stdout=subprocess.PIPE)
+			data_eth=p2.communicate()
+			if bool(int(data_eth[0][0])): #tells me whether ethernet is connected or not 1=connected, 0=not connected
+				#ethernet is still attached, try to reconnect to eth0!
+				inet_iface='eth0' #reconnect on ethernet even if it's not in the ip table right now...because it's still plugged in
+			else:  #no ethernet, reconnect on wlan0
+				inet_iface='wlan0'
+		except:
+			pass
 
 	else: #internet CNX! - parse data
 		split_ipRoute = data1[0].split()
