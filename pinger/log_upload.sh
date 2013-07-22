@@ -4,8 +4,9 @@
 # curl -F "file=@$filename_local;filename=$0.jpg" 
 
 echo server_address = $1
-echo job_id passed = $2,
-curl -F "file=@/dev/shm/log.log;filename=$2.log" -m 15 $1
+echo logPath = $2
+echo job_id passed = $3,
+curl -F "file=@$2;filename=$3.log" -m 15 $1
 sudo rm /dev/shm/log.log
 
 #curl reference

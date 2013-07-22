@@ -2,6 +2,7 @@ import subprocess
 from subprocess import Popen, PIPE
 import sys
 import os
+import logging
 pathsAdded = False
 
 def printFile(fileName,slicer):
@@ -56,10 +57,6 @@ def findPrinter():
 	os.chdir(currPath)
 
 
-
-
-def cancelCurrent():
-	pass
 
 if __name__ == '__main__':
 	printFile('')
