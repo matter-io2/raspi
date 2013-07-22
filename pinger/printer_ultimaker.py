@@ -71,7 +71,7 @@ class printer():
 
 	def get_temp():
 		tmp= None
-		pron.p.send(M105)
+		pron.p.send('M105')
 		line=pron.p._readline()
 		split_line = line.split()
 		tmp=str(split_line[1])[2:len(split_time[1])]
