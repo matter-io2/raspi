@@ -66,6 +66,7 @@ class printer():
 		#technically doesn't end the job but the printer is ready to take a new one
 
 	def get_temp():
+		pass
 		#right code but doesn't send back consistant shit
 		# tmp= None
 		# pron.p.send('M105')
