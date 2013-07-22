@@ -25,8 +25,8 @@ logPath = '/home/pi/raspi/pinger/pinger.log'
 logger = logging.getLogger('pingerLog')	#log name
 
 debug_internet=False
-debug_server_response=False
-debug_printer_socket=False
+debug_server_response=True
+debug_printer_socket=True
 debug_printer_client_socket=False
 debug_webcam=False
 
@@ -86,7 +86,7 @@ def mainBrain():
 	print '\n----INTERNET cnx mediation---- (',debug_internet,')\n'
 #	getInetInfo()
 	if lost_packets>=6: # no ip addres, reconnect after server timeout
-#		reconnectInternet(inet_iface)
+		reconnectInternet(inet_iface)
 		#should handle hotswapping...
 
 	#2) PRINTER mediation - user print to debug
@@ -907,7 +907,7 @@ class UnixSocketProtocol(Protocol):
 		if debug_printer_socket: 
 			print '\nmethod =',printerData['method']
 			print 'print job update:'
-			print '\tfilename:\t\t',job_filename
+			print '\tfilename:\t',job_filename
 			print '\tJob ID:\t\t',job_id
 			print '\tJob num:\t',job_num		
 			print '\tPrinter In Use:\t',printer_inUse
