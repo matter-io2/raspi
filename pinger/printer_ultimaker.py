@@ -17,7 +17,7 @@ pron=pronsole.pronsole()
 pron.p=printcore.printcore()
 
 class printer():
-	def printerConnect():
+	def printerConnect(pi_id):
 		print 'trying to connect to printer...'
 		online == False
 		port = '/dev/ttyACM0'#defines port name for arduino
@@ -46,7 +46,6 @@ class printer():
 				#this will always tell you when it's connected but comes before the possible ID
 			elif (line != None) and (line != ''):#if its connected
 			 	#printer_printerId = getPrinterID()
-			 	get_pi_id()
 			 	printer_printerID = pi_id
 			 	online = True
 			 	break
@@ -69,4 +68,13 @@ class printer():
 		pron.do_move("z 200")
 		pron.do_settemp("0")
 		#technically doesn't end the job but the printer is ready to take a new one
+
+	def get_temp():
+		tmp= None
+		pron.p.send(M105)
+		line=pron.p._readline()
+		split_line = line.split()
+		tmp=str(split_line[1])[2:len(split_time[1])]
+
+
 if __name__ == '__main__':
