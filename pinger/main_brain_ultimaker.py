@@ -17,23 +17,11 @@ from zope.interface import implements
 from twisted.internet.defer import succeed
 from twisted.web.iweb import IBodyProducer
 
-#import Printrun Stuff
-import printcore
-import pronsole
-from printrun.printrun_utils import install_locale
-from printrun import gcoder
-install_locale('pronterface')
+#all ultimaker stuff in printer.ultimaker.py
+import printer_ultimaker
 
-from printrun.GCodeAnalyzer import GCodeAnalyzer
-from printrun import gcoder
+ult=printer_ultimaker.printer()
 
-import thread
-from threading import Thread
-
-#define pronsole
-pron=pronsole.pronsole()
-#define printcore
-pron.p=printcore.printcore()
 
 #server = 'http://matter.io/'
 server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
@@ -106,12 +94,14 @@ def mainBrain():
 
 		elif printer_type == 'Utlimaker':
 			print '\n\n START ULTIMAKER pinger \n\n'
-			print 'switching not yet implemented \n\n'
-			printerConnect() #now checks printer_type in Makerbot script
+			#print 'switching not yet implemented \n\n'
+			get_pi_id()
+			ult.printerConnect(pi_id) #now checks printer_type in Makerbot script
 		elif printer_type == 'LulzBot':
 			print '\n\n START LULZBOT pinger \n\n'
-			print 'switching not yet implemented \n\n'
-			printerConnect() #now checks printer_type in Makerbot script
+			#print 'switching not yet implemented \n\n'
+			get_pi_id()
+			ult.printerConnect(pi_id) #now checks printer_type in Makerbot script
 		else:
 			print 'no known printers in lsusb'
 
@@ -218,43 +208,10 @@ def getPrinterType():
 def printerConnect():
 	print 'trying to connect to printer...'
 	online == False
-	if printer_type == 'Makerbot':
 		makeCmdlineReq('hello')  # handshake!  
 		makeCmdlineReq('connect',{'machine_name':None ,'port_name':None , 'persistent':'true','profile_name':'Replicator2' ,'driver_name':'s3g'})  # gets printer properties! 
 		#potential bug, this may only connect to Rep2 and not 2X or Rep1
 		#once command is pushed, response should come back through socket, but asynchronously
-	else:#printer is Ultimaker, Lulzbot, or other
-		port = '/dev/ttyACM0'#defines port name for arduino
-		#^need to stop pi from locking port in /var/lock/LCK..ttyACM0
-		#switches when switching printers?
-		#gets locked everytime program is stopped w/'control z'
-		baud = '115200'
-		#it works but not consistently
-		#Way to prompt printer to send back info?
-		pron.p.connect(port, baud)
-		while True:
-			line=pron.p._readline()#reads output from printer, returns by line
-			#^need to parse
-			if (line == None) or (line == ''):
-				break
-			print (line)
-			#Ultimaker only send back an ID when it wants :(
-			#Marlin doesn't set a unique printer ID
-			#not sure what this is
-			if line.find('echo: External',0,len(line)) != -1:
-				(before,sep,after)=line.partition('-')
-				(b,s,a)=after.partition(' ')
-				printer_printerId = b
-				online = True
-				break
-				#this will always tell you when it's connected but comes before the possible ID
-			elif (line != None) and (line != ''):#if its connected
-			 	#printer_printerId = getPrinterID()
-			 	get_pi_id()
-			 	printer_printerID = pi_id
-			 	online = True
-			 	break
-
 		print "!!new printerId", printer_printerId
 
 
@@ -458,11 +415,7 @@ def parseJSON(bodyString):
 				makeCmdlineReq('hello')  # handshake!  
 				makeCmdlineReq('canceljob',{'id':job_num})  # kills job [id]
 			else:#Ultimkadr, Lulzbot, etc...
-				pron.do_pause(port)
-				pron.do_home("xye")
-				pron.do_move("z 200")
-				pron.do_settemp("0")
-				#technically doesn't end the job but the printer is ready to take a new one
+				ult.do_cancel()
 			job_num = -1 # important to say new job has not yet been added 
 			# makeCmdlineReq('hello')  # handshake!  
 			# makeCmdlineReq('getjob',{'id':job_num})  # kills job [id]		
@@ -501,16 +454,9 @@ def printFile(fileName):
 	if printer_type=='Makerbot':
 		p.printFile(fileName,slicer)
 	else:#Ultimaker, Lulzbot, etc...
-		reprap print function here
+		#reprap print function here
 		#######################
-		gcode = [i.strip() for i in open(filename)]#sends gcode line by line
-		gcode = gcoder.GCode(gcode)
-		###########################^this should probably be done server side
-		pron.p.startprint(gcode) #calls method in printcore through pronsole only takes arrays
-		#while printing
-		#M105 - Read current temp
-		#M117 - display message
-		#	line=pron.p._readline()
+		ult.printFile(fileName)
 #LIGHTS - fLASH GREEN WHEN GOING
 
 def print500Response(bodyString):
