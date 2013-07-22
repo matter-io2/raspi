@@ -58,7 +58,7 @@ job_filename = ''
 job_num = -1  # (def) -1, read from jobadded or jobchanged in UNIXsocket
 job_process = 'idle'
 job_progress = -1
-job_conclusion = '' # 'ENDED','CANCELED','FAILED' 
+job_conclusion = ''  # 'ENDED','CANCELED','FAILED' 
 job_started = False
 job_fail_msg = ''
 ip_address = ''
@@ -75,6 +75,7 @@ def mainBrain():
 	#variables I need - 
 	global inet_iface, lost_packets, pic_count
 	global printer_type, printer_printerId, printer_inUse
+	global job_conclusion, printer_inUse
 	global pi_id, online, ip_address
 	global debug_internet
 	global debug_internet, debug_server_response, debug_printer_socket, debug_printer_client_socket, debug_webcam
@@ -119,20 +120,28 @@ def mainBrain():
 
 	#5) UPDATE AND LOG UPLOAD
 	print '\n----UPDATE mediation----\n'
-	if job_conclusion!='' and not printer_inUse and ip_address!='': # job just finished, printer's not being used, and we have internet
-		
-		#UPDATE via git
-		arg='/home/pi/raspi/piConfig/update_routine.sh'
-		p_new=subprocess.Popen(arg,shell=True)
-		#this script runs git fetch and will update branches if there's something new available.
-		# it will also restart the startup script (canceling pinger and conveyor_service)
-		#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
+	print 'job_conclusion', job_conclusion
+	print 'printer_inUse',printer_inUse
+	if ip_address != '':
+		print 'has an ip address'
+		if not printer_inUse:
+				print 'printer not in use'
+			#if ip_address!='': # job just finished, printer's not being used, and we have internet
+			#	print 'has an ip address'
+				print 'attempting update now'
+				#UPDATE via git
+				arg='/home/pi/raspi/piConfig/update_routine.sh'
+				p_new=subprocess.Popen(arg,shell=True)
+				#this script runs git fetch and will update branches if there's something new available.
+				# it will also restart the startup script (canceling pinger and conveyor_service)
+				#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
 
-		#upload last job's log file
-		#LOG UPLOAD
-		makeRequest('log',status) #status=done
+				#upload last job's log file
+				#LOG UPLOAD
+				makeRequest('log',status) #status=done
 		
-		update_and_log=True
+				update_and_log=True
+	print 'update/log finished'
 	#LOGGING:
 	#download
 	#printCmd, printExec(state_change)
@@ -402,6 +411,7 @@ def makeRequest(req_type,status):
 												'job_fail_msg':job_fail_msg,
 												'status':status}))
 						)
+
 	elif req_type=='pi':
 		if debug_server_response:
 		# debugger that shows what is being posted to the server (see agent.request for actual posting)	
@@ -434,7 +444,7 @@ def makeRequest(req_type,status):
 	elif req_type=='log':
 		address = server+'piLogUpload'
 		arg = ['/home/pi/raspi/pinger/log_upload.sh',address,str(logPath),str(job_id)]
-		p_job_log=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
+		p_job_log=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 
 		# curl -F "file=@/dev/shm/$2_$3.jpg;filename=$2_$3.jpg" -m 15 address
 
@@ -444,7 +454,8 @@ def makeRequest(req_type,status):
 	lost_packets = lost_packets+1
 
 	# adds next method to polling
-	d.addCallback(cbRequest, cookieJar)
+	if req_type=='pi' or req_type=='printer':
+		d.addCallback(cbRequest, cookieJar)
 
 	# #this should live in main brain somewhere higher
 	# # if lost_packets >= 5 and not printer_inUse:
