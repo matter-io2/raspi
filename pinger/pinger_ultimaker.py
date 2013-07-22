@@ -376,7 +376,20 @@ def findPrinter_and_Ip():
 			 	break
 
 		print "!!new printerId", printer_printerId
-
+		pron.p.send('M105')
+		while True:
+			line=pron.p._readline()
+			print('M105: '+line)
+			elif (line != None) and (line != ''):#if its connected
+			 	online = True
+			 	break
+		pron.p.send('M117')
+		while True:
+			line=pron.p._readline()
+			print('M117: '+line)
+			elif (line != None) and (line != ''):#if its connected
+			 	online = True
+			 	break
 #DREW-end
 
 	if ip_address == '':
