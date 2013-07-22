@@ -11,10 +11,6 @@ from printrun import gcoder
 import thread
 from threading import Thread
 
-#define pronsole
-pron=pronsole.pronsole()
-#define printcore
-pron.p=printcore.printcore()
 
 class printer():
 	def printerConnect(pi_id):
@@ -77,5 +73,8 @@ class printer():
 		# split_line = line.split()
 		# tmp=str(split_line[1])[2:len(split_time[1])]
 
-
 if __name__ == '__main__':
+	#define pronsole
+	pron=pronsole.pronsole()
+	#define printcore
+	pron.p=printcore.printcore()
