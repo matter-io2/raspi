@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, '../Printrun')
+
 #import Printrun Stuff
 import printcore
 import pronsole
