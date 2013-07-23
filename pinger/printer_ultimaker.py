@@ -1,4 +1,5 @@
 import sys
+import subprocess
 sys.path.insert(0, '../Printrun')
 
 #import Printrun Stuff
@@ -43,20 +44,28 @@ class printer():
 			#Ultimaker only send back an ID when it wants :(
 			#Marlin doesn't set a unique printer ID
 			#not sure what this is
-			if line.find('echo: External',0,len(line)) != -1:
-				(before,sep,after)=line.partition('-')
-				(b,s,a)=after.partition(' ')
-				printer_printerID = b
-				online = True
-				break
-				#this will always tell you when it's connected but comes before the possible ID
-			elif (line != None) and (line != ''):#if its connected
-			 	#printer_printerId = getPrinterID()
-			 	printer_printerID = pi_id
+			# if line.find('echo: External',0,len(line)) != -1:
+			# 	(before,sep,after)=line.partition('-')
+			# 	(b,s,a)=after.partition(' ')
+			# 	printer_printerID = b
+			# 	online = True
+			# 	break
+			# 	#this will always tell you when it's connected but comes before the possible ID
+			if (line != None) and (line != ''):#if its connected
+			 	printer_printerID = self.get_unique_id()
+			 	#printer_printerID = pi_id
 			 	online = True
 			 	break
 
 		print "!!new printerId", printer_printerID
+	def get_unique_id(self):
+		p= subprocess.Popen('udevadm info -q all -n /dev/ttyACM0',shell=True,stdout=subprocess.PIPE)
+		dev_info = p.communicate()
+		splt = dev_info[0].split()
+		for x in splt:
+			if 'ID_SERIAL_SHORT=' in x:
+				return x[x.find('=')+1:len(x)-1]
+				break
 
 	def findPrinter(self, piID):
 		global printer_printerID
