@@ -87,6 +87,7 @@ def mainBrain():
 	#printer moderation
 	if printer_printerId == '': # no printer
 		getPrinterType()
+		print ("Type: "+ printer_type)
 		if printer_type == 'Makerbot':
 			print 'found a makerbot in the makerbot script'
 			printerConnect() #connects to makerbot printers
