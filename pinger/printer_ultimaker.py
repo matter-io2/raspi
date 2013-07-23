@@ -59,9 +59,10 @@ class printer():
 		print "!!new printerId", printer_printerID
 
 	def findPrinter(self, piID):
-		global printer_printerID 
+		global printer_printerID
+		global pi_id
 		pi_id = piID
-		if printer_printerID == '':
+		if printer_printerID == '' or printer_printerID == None:
 			print 'trying to connect to printer...'
 			online = False
 			self.printer_Connect()
