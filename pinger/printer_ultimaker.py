@@ -54,6 +54,17 @@ class printer():
 			 	break
 
 		print "!!new printerId", printer_printerId
+	def findPrinter_and_Ip(self, pi_id):
+		global printer_profile, printer_firmware, printer_printerId 
+
+		if printer_printerId == '':
+			print 'trying to connect to printer...'
+			online = False
+			printer_Connect(pi_id)
+		else:
+			print 'no LAN IP address assigned - missing "src" key'
+			ip_address = ''
+			reconnectInternet()
 
 	def print_File(self, fileName):
 		gcode = [i.strip() for i in open(filename)]#sends gcode line by line
