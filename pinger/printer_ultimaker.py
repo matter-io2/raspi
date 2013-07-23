@@ -20,7 +20,7 @@ printer_printerID = ''
 pi_id = None
 
 class printer():
-	def printer_Connect():
+	def printer_Connect(self):
 		global online
 		global printer_printerID
 		global pi_id
