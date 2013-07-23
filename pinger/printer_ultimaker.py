@@ -63,7 +63,9 @@ class printer():
 		dev_info = p.communicate()
 		splt = dev_info[0].split()
 		for x in splt:
+			print x
 			if 'ID_SERIAL_SHORT=' in x:
+				print ('RETURNED: '+ x[x.find('=')+1:len(x)-1])
 				return x[x.find('=')+1:len(x)-1]
 				break
 
