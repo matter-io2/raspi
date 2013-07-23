@@ -1,6 +1,8 @@
 
 #! /bin/bash
 
+#comment 1
+
 #cleanup
 #sudo killall python
 
