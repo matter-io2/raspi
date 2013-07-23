@@ -94,13 +94,13 @@ def mainBrain():
 			ult=printer_ultimaker.printer()#initialize ultimaker driver file
 			#print 'switching not yet implemented \n\n'
 			get_pi_id()
-			ult.findPrinter_and_Ip(pi_id) #now checks printer_type in Makerbot script
+			ult.findPrinter(pi_id) #now checks printer_type in Makerbot script
 		elif printer_type == 'LulzBot':
 			print '\n\n START LULZBOT pinger \n\n'
 			ult=printer_ultimaker.printer()#initialize ultimaker driver file
 			#print 'switching not yet implemented \n\n'
 			get_pi_id()
-			ult.findPrinter_and_Ip(pi_id) #now checks printer_type in Makerbot script
+			ult.findPrinter(pi_id) #now checks printer_type in Makerbot script
 		else:
 			print 'no known printers in lsusb'
 

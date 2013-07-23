@@ -17,10 +17,13 @@ pron.p=printcore.printcore()
 
 printer_printerID = ''
 
+pi_id = None
+
 class printer():
-	def printer_Connect(self, pi_id):
+	def printer_Connect():
 		global online
 		global printer_printerID
+		global pi_id
 		print 'trying to connect to printer...'
 		online = False
 		port = '/dev/ttyACM0'#defines port name for arduino
@@ -53,18 +56,15 @@ class printer():
 			 	online = True
 			 	break
 
-		print "!!new printerId", printer_printerID
-	def findPrinter_and_Ip(self, pi_id):
-		global printer_profile, printer_firmware, printer_printerID 
+		print "!!new printerId", 
 
+	def findPrinter(self, piID):
+		global printer_printerID 
+		pi_id = piID
 		if printer_printerID == '':
 			print 'trying to connect to printer...'
 			online = False
-			printer_Connect(pi_id)
-		else:
-			print 'no LAN IP address assigned - missing "src" key'
-			ip_address = ''
-			reconnectInternet()
+			printer_Connect()
 
 	def print_File(self, fileName):
 		gcode = [i.strip() for i in open(filename)]#sends gcode line by line
