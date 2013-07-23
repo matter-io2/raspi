@@ -83,6 +83,8 @@ def mainBrain():
 	global pi_id, online, ip_address
 	global update_and_log
 	global debug_internet, debug_server_response, debug_printer_socket, debug_printer_client_socket, debug_webcam
+	global logPath
+
 	status='done'
 
 	#1) INTERNET cnx mediation - user print to debug
@@ -132,6 +134,7 @@ def mainBrain():
 			#LOG UPLOAD
 			print '\n\n\n\n\nattempting upload of log\n\n\n\n\n'
 			makeRequest('log',status) #status=done
+			setupLog(logPath)
 
 			print '\n\n\n\n\nattempting update now\n\n\n\n\n'
 			#UPDATE via git
@@ -142,7 +145,6 @@ def mainBrain():
 			arg='/home/pi/raspi/pinger/update_current.sh'
 			p_git=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 			data_git=p_git.communicate()
-			
 			update_and_log=False
 
 	print 'update/log section finished'
@@ -468,6 +470,8 @@ def makeRequest(req_type,status):
 		p_job_log=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 		#block!
 		data_log=p_job_log.communicate()
+		setupLog(logPath)
+
 		#might want this data later
 		
 
@@ -555,7 +559,7 @@ def parseJSON(bodyString):
 			job_conclusion = '' #defaults to '' when job has not concluded (used above)
 			job_started = False
 			#need to keep job_num for cancel command
-	
+
 		#Cancel job (currentJob or previous job that was left running)
 	else: #no job_id key
 		if printer_inUse:

@@ -9,7 +9,10 @@ echo name passed = $3,
 output=",%{url_effective},%{size_upload},%{speed_upload},%{time_total},%{time_connect}"
 curl -F "file=@$2;filename=$3.log" -m 15 -s -w $output $1
 
-#sudo rm /home/pi/raspi/pinger/pinger.log
+if[ $4 -eq 'rm' ]
+then
+	sudo rm /home/pi/raspi/pinger/pinger.log
+fi
 
 #curl reference
 #http://curl.haxx.se/docs/manpage.html#-F
