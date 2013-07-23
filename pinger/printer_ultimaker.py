@@ -15,9 +15,12 @@ pron=pronsole.pronsole()
 #define printcore
 pron.p=printcore.printcore()
 
+printer_printerID = ''
+
 class printer():
 	def printer_Connect(self, pi_id):
 		global online
+		global printer_printerID
 		print 'trying to connect to printer...'
 		online = False
 		port = '/dev/ttyACM0'#defines port name for arduino
