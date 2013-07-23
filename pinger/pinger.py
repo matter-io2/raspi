@@ -26,8 +26,8 @@ logger = logging.getLogger('pingerLog')	#log name
 
 debug_internet=False
 debug_server_response=False
-debug_printer_socket=False
-debug_printer_client_socket=False
+debug_printer_socket=True
+debug_printer_client_socket=True
 debug_webcam=False
 
 inet_iface=''
