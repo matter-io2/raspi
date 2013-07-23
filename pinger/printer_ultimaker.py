@@ -43,7 +43,7 @@ class printer():
 			if line.find('echo: External',0,len(line)) != -1:
 				(before,sep,after)=line.partition('-')
 				(b,s,a)=after.partition(' ')
-				printer_printerId = b
+				printer_printerID = b
 				online = True
 				break
 				#this will always tell you when it's connected but comes before the possible ID
@@ -53,11 +53,11 @@ class printer():
 			 	online = True
 			 	break
 
-		print "!!new printerId", printer_printerId
+		print "!!new printerId", printer_printerID
 	def findPrinter_and_Ip(self, pi_id):
-		global printer_profile, printer_firmware, printer_printerId 
+		global printer_profile, printer_firmware, printer_printerID 
 
-		if printer_printerId == '':
+		if printer_printerID == '':
 			print 'trying to connect to printer...'
 			online = False
 			printer_Connect(pi_id)
