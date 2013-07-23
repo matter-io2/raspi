@@ -23,6 +23,7 @@ server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 
 logPath = '/home/pi/raspi/pinger/pinger.log'
 logger = logging.getLogger('pingerLog')	#log name
+git_commit=''
 
 debug_internet=False
 debug_server_response=False
@@ -157,6 +158,8 @@ def mainBrain():
 def initialize(): #startup script, only run once at beginning, run here because global variables aren't initialized yet in __main__
 	global debug_internet,debug_server_response,debug_printer_socket,debug_printer_client_socket,debug_webcam
 	global logPath
+	global logger
+	global git_commit
 	print "----Debug Settings----"
 	print "internet", debug_internet
 	print "server_response", debug_server_response
@@ -167,6 +170,14 @@ def initialize(): #startup script, only run once at beginning, run here because 
 	get_pi_id()
 	getInetInfo()
 	setupLog(logPath)
+	#find git commit and post to log files
+	arg=['cd /home/pi/raspi/pinger && git log -1']
+	p_git=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+	data_git=p_git.communicate()
+	if len(data)>1:
+		git_commit=data_git[0]
+
+
 
 # http://docs.python.org/2/library/logging.html
 def setupLog(filepath):
@@ -216,11 +227,12 @@ def getInetInfo():
 		try:	
 			p2=subprocess.Popen('cat /sys/class/net/eth0/carrier',shell=True,stdout=subprocess.PIPE)
 			data_eth=p2.communicate()
-			if bool(int(data_eth[0][0])): #tells me whether ethernet is connected or not 1=connected, 0=not connected
-				#ethernet is still attached, try to reconnect to eth0!
-				inet_iface='eth0' #reconnect on ethernet even if it's not in the ip table right now...because it's still plugged in
-			else:  #no ethernet, reconnect on wlan0
-				inet_iface='wlan0'
+			if len(data_eth)>1:
+				if bool(int(data_eth[0][0])): #tells me whether ethernet is connected or not 1=connected, 0=not connected
+					#ethernet is still attached, try to reconnect to eth0!
+					inet_iface='eth0' #reconnect on ethernet even if it's not in the ip table right now...because it's still plugged in
+				else:  #no ethernet, reconnect on wlan0
+					inet_iface='wlan0'
 		except:
 			pass
 
@@ -364,6 +376,7 @@ def makeRequest(req_type,status):
 	global inet_iface, pic_count
 	global network_name,link_quality,signal_level, noise_level
 	global logPath
+	global git_commit
 	address = server+'printerPing/'	
 	print 'upload address = ',address
 
@@ -372,6 +385,7 @@ def makeRequest(req_type,status):
 			# debugger that shows what is being posted to the server (see agent.request for actual posting)	
 			print 'sending printer data -- printer id is present'
 			print 'Data Sent:',urllib.urlencode({'type':'update',
+												'git_commit':git_commit,
 												'packet_type':req_type,											
 												'online':online,
 												'ipAddress':ip_address,
@@ -513,22 +527,22 @@ def parseJSON(bodyString):
 				job_cancel = True
 		else:
 		#new job_id don't match or
-			logger.warning('Cancel Job - Attempting cancel JOB_IDs DO NOT MATCH')
-			logger.warning('old_job_id:%s job_num:%s ... attempting cancel',str(job_id),str(job_num))
-			logger.warning('new_job_id:%s ',str(bodyDict['job_id']))
-			print '\n\nAttempting cancel JOB_IDs DO NOT MATCH \n\n'
-			print 'old_job_id:',str(job_id),' job_num:',str(job_num),' ... attempting cancel'
-			print 'new_job_id:',str(bodyDict['job_id'])
-			
-			job_id = bodyDict['job_id']
-			job_process = 'idle'
-			job_progress = 0
-			job_conclusion = '' #defaults to '' when job has not concluded (used above)
-			job_started = False
-			#need to keep job_num for cancel command
-			if job_id != '': # not intial value
-				#delete current job
-				job_cancel = True
+			if printer_inUse:
+				logger.warning('Cancel Job - Attempting cancel JOB_IDs DO NOT MATCH')
+				logger.warning('old_job_id:%s job_num:%s ... attempting cancel',str(job_id),str(job_num))
+				logger.warning('new_job_id:%s ',str(bodyDict['job_id']))
+				print '\n\nAttempting cancel JOB_IDs DO NOT MATCH \n\n'
+				print 'old_job_id:',str(job_id),' job_num:',str(job_num),' ... attempting cancel'
+				print 'new_job_id:',str(bodyDict['job_id'])
+				job_id = bodyDict['job_id']
+				job_process = 'idle'
+				job_progress = 0
+				job_conclusion = '' #defaults to '' when job has not concluded (used above)
+				job_started = False
+				#need to keep job_num for cancel command
+				if job_id != '': # not intial value
+					#delete current job
+					job_cancel = True
 		#Cancel job (currentJob or previous job that was left running)
 	else: #no job_id key
 		if printer_inUse:
