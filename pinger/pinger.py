@@ -25,8 +25,8 @@ logPath = '/home/pi/raspi/pinger/pinger.log'
 logger = logging.getLogger('pingerLog')	#log name
 
 debug_internet=False
-debug_server_response=True
-debug_printer_socket=True
+debug_server_response=False
+debug_printer_socket=False
 debug_printer_client_socket=False
 debug_webcam=False
 
@@ -42,6 +42,7 @@ pic_count = 0
 # printer_type=''
 printer_type='Makerbot'
 printer_type_ID=''
+update_and_log=True
 
 printer_profile = 0
 printer_firmware = 0
@@ -78,13 +79,13 @@ def mainBrain():
 	global printer_type, printer_printerId, printer_inUse
 	global job_conclusion, printer_inUse
 	global pi_id, online, ip_address
-	global debug_internet
+	global update_and_log
 	global debug_internet, debug_server_response, debug_printer_socket, debug_printer_client_socket, debug_webcam
 	status='done'
 
 	#1) INTERNET cnx mediation - user print to debug
 	print '\n----INTERNET cnx mediation---- (',debug_internet,')\n'
-#	getInetInfo()
+	getInetInfo()
 	if lost_packets>=6: # no ip addres, reconnect after server timeout
 		reconnectInternet(inet_iface)
 		#should handle hotswapping...
@@ -116,40 +117,38 @@ def mainBrain():
 	#makeRequest(req_type,status) #status=done
 
 	#4) WEBCAM
-	print '\n----WEBCAM mediation----(debug=',debug_webcam,')\n'
-#	webcamPic()
+	if printer_printerId=='':	
+		print '\n----WEBCAM mediation----(debug=',debug_webcam,')\n'
+	webcamPic()
 
 	#5) UPDATE AND LOG UPLOAD
 	print '\n----UPDATE mediation----\n'
-	print 'job_conclusion', job_conclusion
-	print 'printer_inUse',printer_inUse
-	if ip_address != '':
-		print 'has an ip address'
-		if not printer_inUse:
-				print 'printer not in use'
-			#if ip_address!='': # job just finished, printer's not being used, and we have internet
-			#	print 'has an ip address'
-				print 'attempting update now'
-				#UPDATE via git
-				arg='/home/pi/raspi/piConfig/update_routine.sh'
-#				p_new=subprocess.Popen(arg,shell=True)
-				#this script runs git fetch and will update branches if there's something new available.
-				# it will also restart the startup script (canceling pinger and conveyor_service)
-				#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
 
-				#upload last job's log file
-				#LOG UPLOAD
-#				makeRequest('log',status) #status=done
-		
-				update_and_log=True
-	print 'update/log finished'
+	if update_and_log:
+		if ip_address!='' and not printer_inUse:
+			#upload last job's log file
+			#LOG UPLOAD
+			print 'attempting upload of log'
+			makeRequest('log',status) #status=done
+
+			print 'attempting update now'
+			#UPDATE via git
+			#this script runs git fetch and will update branches if there's something new available.
+			# it will also restart the startup script (canceling pinger and conveyor_service)
+			#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
+			
+			arg='/home/pi/raspi/piConfig/update_routine.sh'
+			p_git=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+			data_git=p_git.communicate()
+			
+			update_and_log=False
+
+	print 'update/log section finished'
 	#LOGGING:
 	#download
 	#printCmd, printExec(state_change)
 	#cancelCmd, cancelExec(state_change to STOPPED)
 	#job_conclusion()
-
-	
 
 #driver (below)
 # contains all low level commands
@@ -339,7 +338,6 @@ def webcamPic():
 	global debug_webcam
 	address = server+'webcamUpload'
 	if debug_webcam:
-		print '\n\n\n --------starting webcam_routine call-------- \n\n\n'
 		print 'address for post', address
 		print 'printer id = ',printer_printerId
 	if printer_printerId == '': #no printerId, use pi_id
@@ -350,7 +348,7 @@ def webcamPic():
 		p_webcam=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 	pic_count = pic_count +1
 	if debug_webcam:
-		print '\n\n\n --------webcam_routine called-------- \n\n\n'
+		print '\n --------webcam_routine.sh exiting-------- \n'
 
 
 #---------SERVER subroutines-----------
@@ -448,7 +446,7 @@ def makeRequest(req_type,status):
 	elif req_type=='log':
 		address = server+'piLogUpload'
 		arg = ['/home/pi/raspi/pinger/log_upload.sh',str(address),str(logPath),str(job_id)]
-		p_job_log=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+		p_job_log=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 
 		# curl -F "file=@/dev/shm/$2_$3.jpg;filename=$2_$3.jpg" -m 15 address
 
@@ -458,7 +456,7 @@ def makeRequest(req_type,status):
 	lost_packets = lost_packets+1
 
 	# adds next method to polling
-	if req_type=='pi' or req_type=='printer':
+	if req_type!='log':
 		d.addCallback(cbRequest, cookieJar)
 
 	# #this should live in main brain somewhere higher
@@ -535,7 +533,7 @@ def parseJSON(bodyString):
 	else: #no job_id key
 		if printer_inUse:
 			print '\n\n\n\n\nprinter in use w/ no job_id from server... \n THIS SHOULD NEVER HAPPEN!!!\n\n\n\n'
-			logger.warning('Cancel Job - printer in use w/ no job_id saved from server... this should never happen - noJobIdcount=%s',str(no_job_id_count))
+			logger.warning('Cancel Job - printer in use w/ no job_id saved from server... this should never happen - noJobIdcount=%s',str(no_job_id_key_count))
 			no_job_id_key_count = no_job_id_key_count+1
 			if no_job_id_key_count>6: #prevents cancel from stray job cancels
 				job_cancel = True
@@ -787,7 +785,7 @@ class UnixSocketProtocol(Protocol):
 		global pi_id
 		global job_fail_msg
 		global debug_printer_socket
-		global logger
+		global logger, update_and_log
 		# DEBUG - supressing json output
 		# print 'PRINTER SOCKET:',
 		# print '\n'.join([l.rstrip() for l in data.splitlines()])
@@ -850,6 +848,7 @@ class UnixSocketProtocol(Protocol):
 					elif printerData['params']['state'] == 'STOPPED':
 						job_conclusion = printerData['params']['conclusion']
 						printer_inUse = False
+						update_and_log=True
 						if debug_printer_socket: print '\n job state STOPPED \N'
 						logger.warning('job STOPPED')
 						logger.warning('job conclusion: %s',job_conclusion)
