@@ -20,9 +20,6 @@ from twisted.web.iweb import IBodyProducer
 #all ultimaker stuff in printer.ultimaker.py
 import printer_ultimaker
 
-ult=printer_ultimaker.printer()
-
-
 #server = 'http://matter.io/'
 server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 #connection = 'eth0'
@@ -54,6 +51,8 @@ job_fail_msg = ''
 ip_address = ''
 
 known_printers = ['']
+
+ult=printer_ultimaker.printer()
 
 ##main brain services
 # moderate wifi connection
@@ -94,11 +93,13 @@ def mainBrain():
 			pass #we're already in the Makerbot script
 		elif printer_type == 'Ultimaker':
 			print '\n\n START ULTIMAKER pinger \n\n'
+			ult=printer_ultimaker.printer()#initialize ultimaker driver file
 			#print 'switching not yet implemented \n\n'
 			get_pi_id()
 			ult.printerConnect(pi_id) #now checks printer_type in Makerbot script
 		elif printer_type == 'LulzBot':
 			print '\n\n START LULZBOT pinger \n\n'
+			ult=printer_ultimaker.printer()#initialize ultimaker driver file
 			#print 'switching not yet implemented \n\n'
 			get_pi_id()
 			ult.printerConnect(pi_id) #now checks printer_type in Makerbot script
