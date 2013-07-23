@@ -14,8 +14,9 @@ from printrun import gcoder
 
 class printer():
 	def printer_Connect(self, pi_id):
+		global online
 		print 'trying to connect to printer...'
-		online == False
+		online = False
 		port = '/dev/ttyACM0'#defines port name for arduino
 		#^need to stop pi from locking port in /var/lock/LCK..ttyACM0
 		#switches when switching printers?
