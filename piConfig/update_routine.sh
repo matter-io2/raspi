@@ -32,10 +32,12 @@ echo "fetch finished"
 if [ "${reslog_working}" != "" ] ; then
  	new_update=true
  	echo 'updating working_base branch'
- 	sudo killall python
+
  	git checkout working_base
  	git merge origin/working_base #completing the pull
  	echo 'new update on working_base, restart pinger at next stop'>/home/pi/raspi/piConfig/update.log
+ 	sudo killall python
+	sudo /home/pi/raspi/piConfig/startup_verbose.sh
 else
 	echo '"working_base" branch already up-to-date'
 fi
