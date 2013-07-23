@@ -83,7 +83,6 @@ def mainBrain():
 	global pi_id, online, ip_address
 	global update_and_log
 	global debug_internet, debug_server_response, debug_printer_socket, debug_printer_client_socket, debug_webcam
-	global logPath
 
 	status='done'
 
@@ -134,7 +133,6 @@ def mainBrain():
 			#LOG UPLOAD
 			print '\n\n\n\n\nattempting upload of log\n\n\n\n\n'
 			makeRequest('log',status) #status=done
-			setupLog(logPath)
 
 			print '\n\n\n\n\nattempting update now\n\n\n\n\n'
 			#UPDATE via git
@@ -378,7 +376,6 @@ def makeRequest(req_type,status):
 	global server, lost_packets
 	global inet_iface, pic_count
 	global network_name,link_quality,signal_level, noise_level
-	global logPath
 	global git_commit
 	address = server+'printerPing/'	
 	print 'upload address = ',address
@@ -446,7 +443,7 @@ def makeRequest(req_type,status):
 																'signal_level':signal_level,
 																'noise_level':noise_level,
 																'status':status})
-	# posts information to server
+		# posts information to server
 		d = agent.request(	'POST',
 							address,
 							Headers({'Content-Type': ['application/x-www-form-urlencoded']}),
@@ -466,16 +463,12 @@ def makeRequest(req_type,status):
 		address=server+'piLogUpload'
 		time_stamp=datetime.now().strftime("%Y-%m-%d__%I:%M:%S%p")
 		name=time_stamp+job_id
-		arg=['/home/pi/raspi/pinger/log_upload.sh',str(address),str(logPath),str(name)]
+		arg=['/home/pi/raspi/pinger/log_upload.sh',str(address),str(logPath),str(name),'rm']
 		p_job_log=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 		#block!
 		data_log=p_job_log.communicate()
-		setupLog(logPath)
 
 		#might want this data later
-		
-
-
 		# curl -F "file=@/dev/shm/$2_$3.jpg;filename=$2_$3.jpg" -m 15 address
 
 	if debug_server_response:
