@@ -27,8 +27,8 @@ class printer():
 		global pi_id
 		print 'trying to connect to printer...'
 		online = False
-		#port = '/dev/ttyACM0'#defines port name for arduino
-		port = '/dev/ttyACM1'
+		port = '/dev/ttyACM0'#defines port name for arduino
+		#port = '/dev/ttyACM1'
 		#^need to stop pi from locking port in /var/lock/LCK..ttyACM0
 		#switches when switching printers?
 		#gets locked everytime program is stopped w/'control z'
