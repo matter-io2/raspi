@@ -11,6 +11,9 @@ install_locale('pronterface')
 from printrun.GCodeAnalyzer import GCodeAnalyzer
 from printrun import gcoder
 
+pron=pronsole.pronsole()
+#define printcore
+pron.p=printcore.printcore()
 
 class printer():
 	def printer_Connect(self, pi_id):
