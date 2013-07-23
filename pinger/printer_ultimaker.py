@@ -13,7 +13,7 @@ from printrun import gcoder
 
 
 class printer():
-	def printer_Connect(pi_id):
+	def printer_Connect(self, pi_id):
 		print 'trying to connect to printer...'
 		online == False
 		port = '/dev/ttyACM0'#defines port name for arduino
@@ -48,7 +48,7 @@ class printer():
 
 		print "!!new printerId", printer_printerId
 
-	def print_File(fileName):
+	def print_File(self, fileName):
 		gcode = [i.strip() for i in open(filename)]#sends gcode line by line
 		gcode = gcoder.GCode(gcode)
 		###########################^this should probably be done server side
