@@ -128,10 +128,10 @@ def mainBrain():
 		if ip_address!='' and not printer_inUse:
 			#upload last job's log file
 			#LOG UPLOAD
-			print 'attempting upload of log'
+			print '\n\n\n\n\nattempting upload of log\n\n\n\n\n'
 			makeRequest('log',status) #status=done
 
-			print 'attempting update now'
+			print '\n\n\n\n\nattempting update now\n\n\n\n\n'
 			#UPDATE via git
 			#this script runs git fetch and will update branches if there's something new available.
 			# it will also restart the startup script (canceling pinger and conveyor_service)
