@@ -458,9 +458,16 @@ def makeRequest(req_type,status):
 															'status':status}))
 						)
 	elif req_type=='log':
-		address = server+'piLogUpload'
-		arg = ['/home/pi/raspi/pinger/log_upload.sh',str(address),str(logPath),str(job_id)]
+		address=server+'piLogUpload'
+		time_stamp=datetime.now().strftime("%Y-%m-%d__%I:%M:%S%p")
+		name=time_stamp+job_id
+		arg=['/home/pi/raspi/pinger/log_upload.sh',str(address),str(logPath),str(name)]
 		p_job_log=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
+		#block!
+		data_log=p_job_log.communicate()
+		#might want this data later
+		
+
 
 		# curl -F "file=@/dev/shm/$2_$3.jpg;filename=$2_$3.jpg" -m 15 address
 
