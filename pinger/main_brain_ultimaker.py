@@ -91,7 +91,8 @@ def mainBrain():
 		if printer_type == 'Makerbot':
 			print 'found a makerbot in the makerbot script'
 			printerConnect() #connects to makerbot printers
-		elif printer_type == 'Utlimaker':
+			pass #we're already in the Makerbot script
+		elif printer_type == 'Ultimaker':
 			print '\n\n START ULTIMAKER pinger \n\n'
 			#print 'switching not yet implemented \n\n'
 			get_pi_id()
