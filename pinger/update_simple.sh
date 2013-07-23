@@ -1,11 +1,7 @@
 
 #! /bin/bash
 
-<<<<<<< HEAD
-
-=======
 #comment 1
->>>>>>> 8737567edfd086923fdbd57c30b37bf23fc6dc22
 #comment 2
 #cleanup
 #sudo killall python
