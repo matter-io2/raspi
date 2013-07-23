@@ -38,7 +38,7 @@ printer_tool2_temp = -1
 printer_bed_temp = -1
 online = False # 'CONNECTED', 'DISCONNECTED'
 
-pi_id = 'ASDF1234'
+unique_pi_id = pi_id = 'ASDF1234'
 
 job_id = ''
 job_filename = ''
@@ -94,13 +94,13 @@ def mainBrain():
 			ult=printer_ultimaker.printer()#initialize ultimaker driver file
 			#print 'switching not yet implemented \n\n'
 			get_pi_id()
-			printer_printerId = ult.findPrinter(pi_id) #now checks printer_type in Makerbot script
+			printer_printerId = ult.findPrinter(unique_pi_id) #now checks printer_type in Makerbot script
 		elif printer_type == 'LulzBot':
 			print '\n\n START LULZBOT pinger \n\n'
 			ult=printer_ultimaker.printer()#initialize ultimaker driver file
 			#print 'switching not yet implemented \n\n'
 			get_pi_id()
-			printer_printerId = ult.findPrinter(pi_id) #now checks printer_type in Makerbot script
+			printer_printerId = ult.findPrinter(unique_pi_id) #now checks printer_type in Makerbot script
 		else:
 			print 'no known printers in lsusb'
 
@@ -232,6 +232,7 @@ def findPrinter_and_Ip():
 		reconnectInternet()
 def get_pi_id():  #saves raspi's serial # as unique pi_id
 	global pi_id
+	global unique_pi_id
 	arg='cat /proc/cpuinfo'
 	p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 	data = p.communicate()
@@ -239,7 +240,7 @@ def get_pi_id():  #saves raspi's serial # as unique pi_id
 	if 'Serial' in split_data:
 		pi_id = split_data[split_data.index('Serial')+2]
 		print '\npi_id:' + str(pi_id) + '\n'
-
+		unique_pi_id = pi_id #for ultimaker driver
 	print 'using old pi id until the server accepts unique pi_idz'
 	pi_id = 'ASDF1234'
 
