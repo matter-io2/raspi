@@ -410,7 +410,7 @@ def makeRequest(req_type,status):
 							address,
 							Headers({'Content-Type': ['application/x-www-form-urlencoded']}),
 							StringProducer(urllib.urlencode({'type':'update',
-												'packet_type':req_type,
+												'git_commit':git_commit,												'packet_type':req_type,
 												'online':online,
 												'ipAddress':ip_address,
 												'printer_profile':printer_profile,
@@ -435,6 +435,7 @@ def makeRequest(req_type,status):
 			print 'sending pi data -- no printer id'
 			print 'Data Sent:',urllib.urlencode({'type':'update',
 																'pi_id':pi_id,
+																'git_commit':git_commit,
 																'online':online,
 																'ipAddress':ip_address,
 																'network_type':inet_iface,															
@@ -450,6 +451,7 @@ def makeRequest(req_type,status):
 							StringProducer(urllib.urlencode({'type':'update',
 															'pi_id':pi_id,
 															'online':online,
+															'git_commit':git_commit,
 															'ipAddress':ip_address,
 															'network_type':inet_iface,															
 															'network_name':network_name,
@@ -529,12 +531,14 @@ def parseJSON(bodyString):
 	if bodyDict.has_key('job_id'):
 		if bodyDict['job_id'] == job_id:
 		# job_ids match!
+			print 'DEBUG: job_id MATCH'
 			if bodyDict.has_key('job_cancelCmd') and bodyDict['job_cancelCmd'] == True and printer_inUse:
 				print '\n\nAttempting cancel for current job via job_cancelCmd \n\n'
 				logger.warning('Cancel Job - command from server for job_id:%s job_num:%s',str(job_id),str(job_num))
 				job_cancel = True
 		else:
 		#new job_id don't match or
+			print 'DEBUG: job_id mismatch'
 			if printer_inUse:
 				logger.warning('Cancel Job - Attempting cancel JOB_IDs DO NOT MATCH')
 				logger.warning('old_job_id:%s job_num:%s ... attempting cancel',str(job_id),str(job_num))
@@ -542,15 +546,16 @@ def parseJSON(bodyString):
 				print '\n\nAttempting cancel JOB_IDs DO NOT MATCH \n\n'
 				print 'old_job_id:',str(job_id),' job_num:',str(job_num),' ... attempting cancel'
 				print 'new_job_id:',str(bodyDict['job_id'])
-				job_id = bodyDict['job_id']
-				job_process = 'idle'
-				job_progress = 0
-				job_conclusion = '' #defaults to '' when job has not concluded (used above)
-				job_started = False
-				#need to keep job_num for cancel command
 				if job_id != '': # not intial value
-					#delete current job
-					job_cancel = True
+						#delete current job
+						job_cancel = True
+			job_id = bodyDict['job_id']
+			job_process = 'idle'
+			job_progress = 0
+			job_conclusion = '' #defaults to '' when job has not concluded (used above)
+			job_started = False
+			#need to keep job_num for cancel command
+	
 		#Cancel job (currentJob or previous job that was left running)
 	else: #no job_id key
 		if printer_inUse:
