@@ -5,8 +5,9 @@ from twisted.web.http_headers import Headers
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet.defer import Deferred
 from twisted.web.client import FileBodyProducer
-import time
+#import time
 from time import time
+from datetime import datetime
 import urllib
 import simplejson as json
 
@@ -174,7 +175,7 @@ def initialize(): #startup script, only run once at beginning, run here because 
 	arg=['cd /home/pi/raspi/pinger && git log -1']
 	p_git=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 	data_git=p_git.communicate()
-	if len(data)>1:
+	if len(data_git)>1:
 		git_commit=data_git[0]
 
 
