@@ -56,7 +56,7 @@ class printer():
 			 	online = True
 			 	break
 
-		print "!!new printerId", 
+		print "!!new printerId", printer_printerID
 
 	def findPrinter(self, piID):
 		global printer_printerID 
@@ -65,6 +65,8 @@ class printer():
 			print 'trying to connect to printer...'
 			online = False
 			self.printer_Connect()
+		else
+			return printer_printerID
 
 	def print_File(self, fileName):
 		gcode = [i.strip() for i in open(filename)]#sends gcode line by line
