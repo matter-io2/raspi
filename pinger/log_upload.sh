@@ -1,17 +1,15 @@
 #! /bin/bash
 
-#DEBUG input
-#echo server_address = $1
-#echo logPath = $2
-#echo job_id passed = $3,
+# filename_local = '/home/pi/Desktop/printer_pic.jpg'
+# curl -F "file=@$filename_local;filename=$0.jpg" 
 
-#defines return format
+echo server_address = $1
+echo logPath = $2
+echo name passed = $3,
 output=",%{url_effective},%{size_upload},%{speed_upload},%{time_total},%{time_connect}"
-
-#upload call
 curl -F "file=@$2;filename=$3.log" -m 15 -s -w $output $1
-#sudo rm /home/pi/raspi/pinger/pinger.log
 
+#sudo rm /home/pi/raspi/pinger/pinger.log
 
 #curl reference
 #http://curl.haxx.se/docs/manpage.html#-F
