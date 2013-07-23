@@ -65,7 +65,7 @@ class printer():
 			print 'trying to connect to printer...'
 			online = False
 			self.printer_Connect()
-		else
+		else:
 			return printer_printerID
 
 	def print_File(self, fileName):
