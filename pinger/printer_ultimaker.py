@@ -65,7 +65,7 @@ class printer():
 		for x in splt:
 			if 'ID_SERIAL_SHORT=' in x:
 				#print ('RETURNED: '+ x[x.find('=')+1:len(x)])
-				return x[x.find('=')+1:len(x)-1]
+				return x[x.find('=')+1:len(x)]
 				break
 
 	def findPrinter(self, piID):
