@@ -183,26 +183,26 @@ def getPrinterType():
 		printer_type_ID = '27b1:0001'
 		printer_type = 'LulzBot AO100'
 		found = True
-	elif 'Arduino' in split_data:#should work for Arduino based RepRaps
-		printer_type_ID = split_data[split_data.index('Arduino')-1]
-		printer_type = 'Unknown'
-		found = True
-	#what's going on below here drew?
-	else:#returns ID when printer has no name
-		cnt=-1
-		for i in split_data:
-			cnt=cnt+1
-			if (i == 'ID'):
-				if (len(split_data)-1)<(cnt+2):
-					printer_type_ID= split_data[cnt+1]
-					printer_type= "Unknown"
-					found = True
-				elif split_data[cnt+2]=='Bus':
-					printer_type_ID= split_data[cnt+1]
-					printer_type= "Unknown"
-					found = True
-	if printer_type == 'Unknown':
-		print 'Not a Recognized Printer \n RepRaps may still work'
+	# elif 'Arduino' in split_data:#should work for Arduino based RepRaps
+	# 	printer_type_ID = split_data[split_data.index('Arduino')-1]
+	# 	printer_type = 'Unknown'
+	# 	found = True
+	# #what's going on below here drew?
+	# else:#returns ID when printer has no name
+	# 	cnt=-1
+	# 	for i in split_data:
+	# 		cnt=cnt+1
+	# 		if (i == 'ID'):
+	# 			if (len(split_data)-1)<(cnt+2):
+	# 				printer_type_ID= split_data[cnt+1]
+	# 				printer_type= "Unknown"
+	# 				found = True
+	# 			elif split_data[cnt+2]=='Bus':
+	# 				printer_type_ID= split_data[cnt+1]
+	# 				printer_type= "Unknown"
+	# 				found = True
+	# if printer_type == 'Unknown':
+	# 	print 'Not a Recognized Printer \n RepRaps may still work'
 	if found==False:
 		print 'No Printer Found'
 
