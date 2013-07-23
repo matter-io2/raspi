@@ -17,7 +17,7 @@ from zope.interface import implements
 from twisted.internet.defer import succeed
 from twisted.web.iweb import IBodyProducer
 
-#all ultimaker stuff in printer.ultimaker.py
+#all ultimaker stuff in printer_ultimaker.py
 import printer_ultimaker
 
 #server = 'http://matter.io/'
@@ -51,8 +51,6 @@ job_fail_msg = ''
 ip_address = ''
 
 known_printers = ['']
-
-ult=printer_ultimaker.printer()
 
 ##main brain services
 # moderate wifi connection
@@ -96,13 +94,13 @@ def mainBrain():
 			ult=printer_ultimaker.printer()#initialize ultimaker driver file
 			#print 'switching not yet implemented \n\n'
 			get_pi_id()
-			ult.printerConnect(pi_id) #now checks printer_type in Makerbot script
+			ult.printer_Connect(pi_id) #now checks printer_type in Makerbot script
 		elif printer_type == 'LulzBot':
 			print '\n\n START LULZBOT pinger \n\n'
 			ult=printer_ultimaker.printer()#initialize ultimaker driver file
 			#print 'switching not yet implemented \n\n'
 			get_pi_id()
-			ult.printerConnect(pi_id) #now checks printer_type in Makerbot script
+			ult.printer_Connect(pi_id) #now checks printer_type in Makerbot script
 		else:
 			print 'no known printers in lsusb'
 
@@ -455,7 +453,7 @@ def printFile(fileName):
 	else:#Ultimaker, Lulzbot, etc...
 		#reprap print function here
 		#######################
-		ult.printFile(fileName)
+		ult.print_File(fileName)
 #LIGHTS - fLASH GREEN WHEN GOING
 
 def print500Response(bodyString):
