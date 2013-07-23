@@ -137,7 +137,7 @@ def mainBrain():
 			# it will also restart the startup script (canceling pinger and conveyor_service)
 			#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
 			
-			arg='/home/pi/raspi/piConfig/update_routine.sh'
+			arg='/home/pi/raspi/pinger/update_current.sh'
 			p_git=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 			data_git=p_git.communicate()
 			
