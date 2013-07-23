@@ -64,7 +64,7 @@ class printer():
 		if printer_printerID == '':
 			print 'trying to connect to printer...'
 			online = False
-			printer_Connect()
+			self.printer_Connect()
 
 	def print_File(self, fileName):
 		gcode = [i.strip() for i in open(filename)]#sends gcode line by line
