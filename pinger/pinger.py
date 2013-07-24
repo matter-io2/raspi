@@ -145,7 +145,7 @@ def mainBrain():
 			arg='/home/pi/raspi/pinger/update_current.sh'
 			#p_git=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 			# data_git=p_git.communicate()
-			p_git=subprocess.Popen(arg,shell=False)
+			p_git=subprocess.Popen(arg)
 			update_and_log=False
 
 	print 'update/log section finished'
