@@ -27,10 +27,10 @@ logger = logging.getLogger('pingerLog')	#log name
 git_commit=''
 
 #comment to attempt update -1
-debug_internet=False
+debug_internet=True
 debug_server_response=False
-debug_printer_socket=True
-debug_printer_client_socket=True
+debug_printer_socket=False
+debug_printer_client_socket=False
 debug_webcam=False
 
 inet_iface=''
@@ -265,9 +265,11 @@ def getInetInfo():
 		if ip_address=='':
 			print "internet interface:",inet_iface
 			print 'no LAN IP address assigned - missing "src" key \n interface is probably inactive'
+			print 'lost packets = ',lost_packets
 		else:
 			print "internet interface:",inet_iface
 			print 'LAN IP Address:' + str(ip_address)
+			print 'lost packets = ',lost_packets
 
 
 #reconnects using sudo ifup [eth0/wlan0]
