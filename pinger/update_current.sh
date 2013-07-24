@@ -28,7 +28,7 @@ if [ "${reslog_working}" != "" ] ; then
  	sudo killall python
 	echo 'sleeping between kill and restart'
 	sleep 5
-	sudo /home/pi/raspi/piConfig/startup_verbose.sh
+	sudo /home/pi/raspi/piConfig/startup.sh
 else
 	echo $current' already up-to-date'
 fi
