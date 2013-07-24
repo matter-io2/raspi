@@ -11,7 +11,8 @@ curl -F "file=@$2;filename=$3.log" -m 15 -s -w $output $1
 
 if [ "$4" = "rm" ]
 then
-	sudo rm /home/pi/raspi/pinger/pinger.log
+	> /home/pi/raspi/pinger/pinger.log
+#	sudo rm /home/pi/raspi/pinger/pinger.log
 fi
 
 #curl reference

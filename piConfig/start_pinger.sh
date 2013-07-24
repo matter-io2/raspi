@@ -4,7 +4,7 @@
 #cd /home/pi
 
 
-#killall python
+#sudo killall -9 python
 #cd /home/pi/raspi/makerbot/conveyor/
 #rm conveyord.socket conveyord.pid conveyord.avail.lock
 #virtualenv/bin/python conveyor_service.py -c conveyor-debian.conf

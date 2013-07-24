@@ -131,8 +131,9 @@ def mainBrain():
 		if ip_address!='' and not printer_inUse:
 			#upload last job's log file
 			#LOG UPLOAD
-			print '\n\n\n\n\nattempting upload of log\n\n\n\n\n'
-			makeRequest('log',status) #status=done
+			if job_id!='':
+				print '\n\n\n\n\nattempting upload of log\n\n\n\n\n'
+				makeRequest('log',status) #status=done
 
 			print '\n\n\n\n\nattempting update now\n\n\n\n\n'
 			#UPDATE via git
@@ -370,7 +371,6 @@ def makeRequest(req_type,status):
 	global debug_server_response
 	global printer_type, printer_type_ID,printer_profile, printer_firmware, printer_printerId, printer_inUse, online
 	global printer_tool1_temp, printer_tool2_temp, printer_bed_temp
-
 	global job_num, job_process, job_progress, job_conclusion
 	global pi_id
 	global server, lost_packets
@@ -462,7 +462,7 @@ def makeRequest(req_type,status):
 	elif req_type=='log':
 		address=server+'piLogUpload'
 		time_stamp=datetime.now().strftime("%Y-%m-%d__%I:%M:%S%p")
-		name=time_stamp+job_id
+		name=printer_printerId+'_'+time_stamp+'_'+job_id
 		arg=['/home/pi/raspi/pinger/log_upload.sh',str(address),str(logPath),str(name),'rm']
 		p_job_log=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 		#block!

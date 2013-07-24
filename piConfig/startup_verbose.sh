@@ -4,7 +4,7 @@
 cd /home/pi
 
 
-killall python
+sudo killall -9 python
 sudo rm /dev/shm/*.jpg #webcam cache location cleared
 
 cd /home/pi/raspi/makerbot/conveyor/
