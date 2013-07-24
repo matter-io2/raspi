@@ -30,6 +30,8 @@ if [ "${reslog_working}" != "" ] ; then
  	git merge origin/$current #completing the pull
  	echo 'new update merged on '$current', restart pinger now'>/home/pi/raspi/piConfig/update.log
  	sudo killall python
+	echo 'sleeping between kill and restart'
+	sleep 5
 	sudo /home/pi/raspi/piConfig/startup_verbose.sh
 else
 	echo $current' already up-to-date'
