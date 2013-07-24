@@ -899,7 +899,9 @@ class UnixSocketProtocol(Protocol):
 					printer_printerId = ''
 				elif printerData['params']['state'] == 'IDLE':
 					#reseting info after job is finished
-					printer_inUse = False 
+					if printer_inUse:  #if it's switching out of an "in use" state
+						update_and_log=True
+					printer_inUse=False		
 				else:
 					printer_profile = printerData['params']['profile_name']
 					printer_firmware = printerData['params']['firmware_version']
