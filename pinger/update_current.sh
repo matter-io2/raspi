@@ -1,5 +1,6 @@
 #! /bin/bash
 
+#comment for fun
 #svn update
 #sudo mount / -o remount,rw
 #cd /home/pi/raspi
