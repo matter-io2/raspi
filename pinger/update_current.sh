@@ -1,11 +1,6 @@
 
 #! /bin/bash
 
-#comment 1
-#comment 2
-#cleanup
-#sudo killall python
-
 #svn update
 #sudo mount / -o remount,rw
 #cd /home/pi/raspi
