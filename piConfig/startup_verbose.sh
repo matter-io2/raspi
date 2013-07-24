@@ -9,7 +9,7 @@ sudo rm /dev/shm/*.jpg #webcam cache location cleared
 
 cd /home/pi/raspi/makerbot/conveyor/
 rm conveyord.socket conveyord.pid conveyord.avail.lock conveyord.log
-virtualenv/bin/python conveyor_service.py -c conveyor-debian.conf
+virtualenv/bin/python conveyor_service.py -c conveyor-raspi.conf
 echo -e '\n ---------conveyord.log (tail 20)----------'
 
 #run these from commandline, comment out here when debugging
