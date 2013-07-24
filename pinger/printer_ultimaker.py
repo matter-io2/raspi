@@ -102,6 +102,8 @@ class printer():
 		#right code but doesn't send back consistant shit
 		tmp= None
 		pron.p.send('M105')
+		#monitor in pronsole has  a "sleep(interval)"
+		#needed? or does pron just have it b/c it loops the monitor
 		line=pron.p._readline()
 		print (line) #debugging
 		#split_line = line.split()
