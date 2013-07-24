@@ -19,8 +19,8 @@ import logging
 from zope.interface import implements
 from twisted.internet.defer import succeed
 from twisted.web.iweb import IBodyProducer
-#server = 'http://matter.io/'
-server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
+server = 'http://matter.io/'
+#server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 
 logPath = '/home/pi/raspi/pinger/pinger.log'
 logger = logging.getLogger('pingerLog')	#log name
@@ -558,6 +558,7 @@ def parseJSON(bodyString):
 			#need to keep job_num for cancel command
 
 		#Cancel job (currentJob or previous job that was left running)
+		no_job_id_key_count=0
 	else: #no job_id key
 		if printer_inUse:
 			print '\n\n\n\n\nprinter in use w/ no job_id from server... \n THIS SHOULD NEVER HAPPEN!!!\n\n\n\n'
@@ -565,6 +566,7 @@ def parseJSON(bodyString):
 			no_job_id_key_count = no_job_id_key_count+1
 			if no_job_id_key_count>6: #prevents cancel from stray job cancels
 				job_cancel = True
+				no_job_id_key_count=0
 	#new features
 	# - working timeout (cancelCmdTime set when cmd is called)
 	# - counter on no_job_id_count...
