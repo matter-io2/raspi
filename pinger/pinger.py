@@ -143,9 +143,9 @@ def mainBrain():
 			#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
 			
 			arg='/home/pi/raspi/pinger/update_current.sh'
-			#p.sh_git=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
+			#p_git=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
 			# data_git=p_git.communicate()
-			p.sh_git=subprocess.Popen(arg,shell=False)
+			p_git=subprocess.Popen(arg,shell=False)
 			update_and_log=False
 
 	print 'update/log section finished'
