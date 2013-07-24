@@ -1,6 +1,7 @@
 #! /bin/bash
 
-#comment for fun
+#comment for testing auto-update
+
 #svn update
 #sudo mount / -o remount,rw
 #cd /home/pi/raspi
