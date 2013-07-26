@@ -68,8 +68,8 @@ printer_type='Ultimaker'
 printer_type_ID=''
 update_and_log=True
 
-printer_profile = 0
-printer_firmware = 'Marlin' #all reprap
+printer_profile = 'Ultimaker' #manually set
+printer_firmware = '300' #all reprap #Marlin
 printer_printerId = ''
 printer_inUse = False
 printer_tool1_temp = -1
