@@ -382,32 +382,16 @@ def reconnectPrinter():
 	#gets locked everytime program is stopped w/'control z'
 	baud = '115200'
 	pron.p.connect(port, baud)
-	while True:#doesn't need to be a loop any more
-		line=pron.p._readline()#reads output from printer, returns by line
-		#^need to parse
-		if (line == None) or (line == ''):
-			break
-		print (line)
-		#Ultimaker only send back an ID when it wants :(
-		#Marlin doesn't set a unique printer ID
-		#not sure what this is
-		# if line.find('echo: External',0,len(line)) != -1:
-		# 	(before,sep,after)=line.partition('-')
-		# 	(b,s,a)=after.partition(' ')
-		# 	printer_printerID = b
-		# 	online = True
-		# 	break
-		#this will always tell you when it's connected but comes before the possible ID
-		if (line != None) and (line != ''):#if its connected
-		 	printer_printerId = get_unique_id()
-		 	#printer_printerID = pi_id #worst case if this stops working #but then need to get unqiue pi_id 
-		 	if printer_printerId != '' or printer_printerId != None:
-		 		online = True
-		 		break
-		 	else:
-		 		print 'No printer ID found'
-		 		logger.warning('No printer id found \n Port /dev/ttyACM0 may be locked in /var/lock \n remove lock or unplug and restart your printer and pi',)
-		 	break
+	line=pron.p._readline()#reads output from printer, returns by line
+	printer_printerId = get_unique_id()# will throw error if printer not plugged in
+	print (line)
+	#printer_printerID = pi_id #worst case if this stops working #but then need to get unqiue pi_id 
+	if printer_printerId != '' or printer_printerId != None:
+		online = True
+	else:
+		print 'No printer ID found'
+		logger.warning('No printer id found \n Port /dev/ttyACM0 may be locked in /var/lock \n remove lock or unplug and restart your printer and pi',)
+	break
 	print "!!new printerId", printer_printerId
 	# gets printer properties
 	#may need to change profile_name, not sure...
