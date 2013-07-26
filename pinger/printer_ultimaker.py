@@ -97,6 +97,7 @@ class printer():
 		pron.do_settemp("0")
 		#technically doesn't end the job but the printer is ready to take a new one
 
+	#prints
 	def do_monitor():
 		#right code but doesn't send back consistant shit
 		tmp= None
