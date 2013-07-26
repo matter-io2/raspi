@@ -391,7 +391,6 @@ def reconnectPrinter():
 	else:
 		print 'No printer ID found'
 		logger.warning('No printer id found \n Port /dev/ttyACM0 may be locked in /var/lock \n remove lock or unplug and restart your printer and pi',)
-	break
 	print "!!new printerId", printer_printerId
 	# gets printer properties
 	#may need to change profile_name, not sure...
