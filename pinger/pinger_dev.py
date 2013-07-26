@@ -754,7 +754,7 @@ def do_monitor():
 	#monitor in pronsole has  a "sleep(interval)"
 	#needed? or does pron just have it b/c it loops the monitor
 	line=pron.p._readline()
-	print ('M105: '+line) #debugging
+	print ('M105: '+str(line)) #debugging
 	#split_line = line.split()
 	#printer_tool1_temp=str(split_line[1])[2:len(split_time[1])]
 	#^still need to parse consistently
