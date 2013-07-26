@@ -399,7 +399,7 @@ def reconnectPrinter():
 		if (line != None) and (line != ''):#if its connected
 		 	printer_printerId = get_unique_id()
 		 	#printer_printerID = pi_id #worst case if this stops working #but then need to get unqiue pi_id 
-		 	if printer_printerId != '' or printer_printerId != None
+		 	if printer_printerId != '' or printer_printerId != None:
 		 		online = True
 		 		break
 		 	else
