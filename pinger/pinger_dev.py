@@ -132,7 +132,7 @@ def mainBrain():
 #DREW - call startup_makerbot.sh
 		elif printer_type=='Ultimaker':
 			print 'there is a ULTIMAKER usb connected'
-			print 'attempting connect to Makerbot printer'
+			print 'attempting connect to Ultimaker printer'
 			reconnectPrinter()
 		elif printer_type=='LulzBot':
 			print 'start LulzBot/reprap pinger'
@@ -403,6 +403,7 @@ def reconnectPrinter():
 		 		online = True
 		 		break
 		 	else:
+		 		print 'No printer ID found'
 		 		logger.warning('No printer id found \n Port /dev/ttyACM0 may be locked in /var/lock \n remove lock or unplug and restart your printer and pi',)
 		 	break
 	print "!!new printerId", printer_printerId
