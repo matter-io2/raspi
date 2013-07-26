@@ -419,23 +419,24 @@ def get_unique_id():
 				#print ('RETURNED: '+ x[x.find('=')+1:len(x)])
 				return x[x.find('=')+1:len(x)]
 #---------WEBCAM subroutine------------
-def webcamPic():
-	global server, pic_count
-	global printer_printerId, pi_id
-	global debug_webcam
-	address = server+'webcamUpload'
-	if debug_webcam:
-		print 'address for post', address
-		print 'printer id = ',printer_printerId
-	if printer_printerId == '': #no printerId, use pi_id
-		#arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(pi_id),str(pic_count)]
-		pass # do nothing if there is no printer_id
-	else:
-		arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count),str(debug_webcam)]
-		p_webcam=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
-	pic_count = pic_count +1
-	if debug_webcam:
-		print '\n --------webcam_routine.sh exiting-------- \n'
+#ADD WEBCAM STUFF TO REPRAP DRIVER
+# def webcamPic():
+# 	global server, pic_count
+# 	global printer_printerId, pi_id
+# 	global debug_webcam
+# 	address = server+'webcamUpload'
+# 	if debug_webcam:
+# 		print 'address for post', address
+# 		print 'printer id = ',printer_printerId
+# 	if printer_printerId == '': #no printerId, use pi_id
+# 		#arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(pi_id),str(pic_count)]
+# 		pass # do nothing if there is no printer_id
+# 	else:
+# 		arg = ['/home/pi/raspi/pinger/webcam_routine.sh',address,str(printer_printerId),str(pic_count),str(debug_webcam)]
+# 		p_webcam=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
+# 	pic_count = pic_count +1
+# 	if debug_webcam:
+# 		print '\n --------webcam_routine.sh exiting-------- \n'
 
 
 #---------SERVER subroutines-----------
