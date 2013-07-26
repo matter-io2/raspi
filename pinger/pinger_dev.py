@@ -149,10 +149,10 @@ def mainBrain():
 
 
 
-	#4) WEBCAM
-	if printer_printerId=='':	
-		print '\n----WEBCAM mediation----(debug=',debug_webcam,')\n'
-	webcamPic()
+	# #4) WEBCAM
+	# if printer_printerId=='':	
+	# 	print '\n----WEBCAM mediation----(debug=',debug_webcam,')\n'
+	# webcamPic()
 
 	#5) UPDATE AND LOG UPLOAD
 	print '\n----UPDATE mediation----\n'
