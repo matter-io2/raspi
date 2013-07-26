@@ -140,6 +140,8 @@ def mainBrain():
 	else:
 		print 'printer connected, id:',printer_printerId
 		req_type='printer'
+		if pron.p.printing:#while printing
+			do_monitor()#update job % and temp
 
 	#3) PING SERVER... once ip_address saving is consistent add - if ip_address!=''
 	#	ping server with printer or pi info
