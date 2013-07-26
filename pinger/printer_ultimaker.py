@@ -98,7 +98,6 @@ class printer():
 		#technically doesn't end the job but the printer is ready to take a new one
 
 	def do_monitor():
-		pass
 		#right code but doesn't send back consistant shit
 		tmp= None
 		pron.p.send('M105')
@@ -112,8 +111,9 @@ class printer():
 		if pron.p.printing:
 			progress = 100*float(pron.p.queueindex)/len(pron.p.mainqueue)
 			progress = int(progress*10)/10.0 #limit precision
-			prev_msg = str(progress) + "%"
-			prog=prev_msg.ljust(0) #"0" used to be prev_msg_len from control2.py
+			#prev_msg = str(progress) + "%"
+			#prog=prev_msg.ljust(0) #"0" used to be prev_msg_len from control2.py
+			print progress
 
 if __name__ == '__main__':
 	#define pronsole
