@@ -40,8 +40,8 @@ pron=pronsole.pronsole()
 pron.p=printcore.printcore()
 
 
-server = 'http://matter.io/'
-#server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
+#server = 'http://matter.io/'
+server = 'http://ec2-107-22-186-175.compute-1.amazonaws.com/'
 
 logPath = '/home/pi/raspi/pinger/pinger.log'
 logger = logging.getLogger('pingerLog')	#log name
