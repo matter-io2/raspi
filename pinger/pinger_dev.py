@@ -154,35 +154,35 @@ def mainBrain():
 	# 	print '\n----WEBCAM mediation----(debug=',debug_webcam,')\n'
 	# webcamPic()
 
-	#5) UPDATE AND LOG UPLOAD
-	print '\n----UPDATE mediation----\n'
+	# #5) UPDATE AND LOG UPLOAD
+	# print '\n----UPDATE mediation----\n'
 
-	if update_and_log:
-		if ip_address!='' and not printer_inUse:
-			#upload last job's log file
-			#LOG UPLOAD
-			if job_id!='':
-				print '\n\n\n\n\nattempting upload of log\n\n\n\n\n'
-				makeRequest('log',status) #status=done
+	# if update_and_log:
+	# 	if ip_address!='' and not printer_inUse:
+	# 		#upload last job's log file
+	# 		#LOG UPLOAD
+	# 		if job_id!='':
+	# 			print '\n\n\n\n\nattempting upload of log\n\n\n\n\n'
+	# 			makeRequest('log',status) #status=done
 
-			print '\n\n\n\n\nattempting update now\n\n\n\n\n'
-			#UPDATE via git
-			#this script runs git fetch and will update branches if there's something new available.
-			# it will also restart the startup script (canceling pinger and conveyor_service)
-			#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
+	# 		print '\n\n\n\n\nattempting update now\n\n\n\n\n'
+	# 		#UPDATE via git
+	# 		#this script runs git fetch and will update branches if there's something new available.
+	# 		# it will also restart the startup script (canceling pinger and conveyor_service)
+	# 		#THUS, MAKE SURE NOTHING IS PRINTING when calling this the update routine
 			
-			arg='/home/pi/raspi/pinger/update_current.sh'
-			#p_git=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
-			# data_git=p_git.communicate()
-			p_git=subprocess.Popen(arg)
-			update_and_log=False
+	# 		arg='/home/pi/raspi/pinger/update_current.sh'
+	# 		#p_git=subprocess.Popen(arg,shell=False,stdout=subprocess.PIPE)
+	# 		# data_git=p_git.communicate()
+	# 		p_git=subprocess.Popen(arg)
+	# 		update_and_log=False
 
-	print 'update/log section finished'
-	#LOGGING:
-	#download
-	#printCmd, printExec(state_change)
-	#cancelCmd, cancelExec(state_change to STOPPED)
-	#job_conclusion()
+	# print 'update/log section finished'
+	# #LOGGING:
+	# #download
+	# #printCmd, printExec(state_change)
+	# #cancelCmd, cancelExec(state_change to STOPPED)
+	# #job_conclusion()
 
 #driver (below)
 # contains all low level commands
