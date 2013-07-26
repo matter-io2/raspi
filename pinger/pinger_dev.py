@@ -402,7 +402,7 @@ def reconnectPrinter():
 		 	if printer_printerId != '' or printer_printerId != None:
 		 		online = True
 		 		break
-		 	else
+		 	else:
 		 		logger.warning('No printer id found \n Port /dev/ttyACM0 may be locked in /var/lock \n remove lock or unplug and restart your printer and pi',)
 		 	break
 	print "!!new printerId", printer_printerId
