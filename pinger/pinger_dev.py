@@ -372,9 +372,9 @@ def getPrinterType():
 
 #DREW_DONE attempts connection to printer
 def reconnectPrinter():
-	global printer_profile, printer_firmware, printer_printerId 
+	global printer_profile, printer_firmware, printer_printerId, online
 	print 'trying to connect to printer...'
-	#online = False
+	online = False
 	port = '/dev/ttyACM0'#defines port name for arduino
 	#port = '/dev/ttyACM1'
 	#^need to stop pi from locking port in /var/lock/LCK..ttyACM0
