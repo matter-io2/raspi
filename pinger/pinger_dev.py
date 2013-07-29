@@ -48,10 +48,10 @@ logger = logging.getLogger('pingerLog')	#log name
 git_commit=''
 
 #comment to attempt update -1
-debug_internet=True
+debug_internet=False
 debug_server_response= True
-debug_printer_socket=False
-debug_printer_client_socket=False
+debug_printer_socket=True
+debug_printer_client_socket=True
 debug_webcam=False
 
 inet_iface=''
