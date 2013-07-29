@@ -687,9 +687,7 @@ def printFile(fileName):
 	gcode = gcoder.GCode(gcode)
 	###########################^this should probably be done server side
 	pron.p.startprint(gcode) #calls method in printcore through pronsole only takes arrays
-	printer_inUse = True #manually set for Ult
 	#can determine when job_process = 'heating' with tool1_temp
-	job_process = 'print'
 	logger.info('print started - %s ',str(fileName))
 
 #LIGHTS - fLASH GREEN WHEN GOING
@@ -765,6 +763,14 @@ def do_monitor():
 		#prev_msg = str(progress) + "%"
 		#prog=prev_msg.ljust(0) #"0" used to be prev_msg_len from control2.py
 		job_progress = prgs
+		printer_inUse = True #manually set for Ult
+		if job_progress>=1.0:
+			job_process = 'print'
+		else:
+			job_process = 'heating'
+	else:
+		printer_inUse = False #manually set for Ult
+		job_process = 'idle'
 
 
 # def makeCmdlineReq(cmd,params = {}):
