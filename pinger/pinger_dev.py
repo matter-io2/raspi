@@ -694,7 +694,7 @@ def printFile(fileName):
 	###########################^this should probably be done server side
 	###########^website shows printer offline during this
 	pron.p.startprint(gcode) #calls method in printcore through pronsole only takes arrays
-	#can determine when job_process = 'heating' with tool1_temp
+	printer_inUse = True #manually set for Ult
 	logger.info('print started - %s ',str(fileName))
 
 #LIGHTS - fLASH GREEN WHEN GOING
