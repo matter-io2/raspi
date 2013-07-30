@@ -692,6 +692,7 @@ def printFile(fileName):
 	gcode = [i.strip() for i in open(filename)]#sends gcode line by line
 	gcode = gcoder.GCode(gcode)
 	###########################^this should probably be done server side
+	###########^website shows printer offline during this
 	pron.p.startprint(gcode) #calls method in printcore through pronsole only takes arrays
 	#can determine when job_process = 'heating' with tool1_temp
 	logger.info('print started - %s ',str(fileName))
