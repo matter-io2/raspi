@@ -772,7 +772,7 @@ def do_monitor():
 			job_process = 'heating'
 			temp_curve = temp_curve+1
 			spd = 500 #lower number = gets closer to full heating bar, but has bigger jump in the beginning
-			trgt = 229 #won't shoing "heating" > 230C
+			trgt = 229 #won't show "heating" > 230C
 			printer_tool1_temp = int((-spd/(temp_curve+(spd/trgt)))+trgt)#fake it untill you make it ;)
 			#^function to show time with limit of 229 (never break the GUI)
 		if job_progress>=99: #doesn't always hit 100
