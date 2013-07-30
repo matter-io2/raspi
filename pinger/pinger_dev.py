@@ -686,8 +686,8 @@ def printFile(fileName):
 	filename = '../Printrun/Small_buddha.gcode' #set filepath for testing until config loads
 	gcode = [i.strip() for i in open(filename)]#sends gcode line by line
 	gcode = gcoder.GCode(gcode)
-	###########################^this should probably be done server side
-	###########^website shows printer offline during this (b/c of timeout?)
+	###########################^this should probably be done server side #BUG
+	###########^website shows printer offline during this (b/c of timeout?) #BUG
 	pron.p.startprint(gcode) #calls method in printcore through pronsole only takes arrays
 	printer_inUse = True #manually set for Ult
 	logger.info('print started - %s ',str(fileName))
@@ -769,6 +769,7 @@ def do_monitor():
 		if job_progress>=99: #doesn't always hit 100
 			job_progress=100
 			job_conclusion = 'ENDED'
+			#BUG #when job is done, user manually has to cancel
 	else:
 		printer_inUse = False #manually set for Ult
 		job_process = 'idle'
