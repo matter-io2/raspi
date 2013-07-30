@@ -678,7 +678,7 @@ def downloadFile(url):
 
 import printer.printer as p
 def printFile(fileName):
-	global logger
+	global logger, printer_inUse
 	print 'In PrintFile',fileName  # shows file path
 	#determine which slicer was used...
 	slicer = "miraclegrue" 
@@ -753,7 +753,7 @@ class BeginningPrinter(Protocol):
 			print reason.printTraceback()
 #DREW_DONE Returns 2 lines upon request 1) needs to be parsed for temp 2) print %
 def do_monitor():
-	global job_progress, printer_tool1_temp
+	global job_progress, printer_tool1_temp, printer_inUse
 	#right code but doesn't send back consistant shit
 	tmp= None
 	#pron.p.send('M105')
@@ -776,7 +776,6 @@ def do_monitor():
 		# 	job_progress=100# sometimes stops early
 	else:
 		printer_inUse = False #manually set for Ult
-		print('False in do_monitor')#TEST
 		job_process = 'idle'
 
 
