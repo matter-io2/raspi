@@ -748,7 +748,7 @@ class BeginningPrinter(Protocol):
 			print reason.printTraceback()
 #DREW_DONE Returns 2 lines upon request 1) needs to be parsed for temp 2) print %
 def do_monitor():
-	global job_progress, printer_tool1_temp, printer_inUse
+	global job_progress, printer_tool1_temp, printer_inUse, job_process
 	#right code but doesn't send back consistant shit
 	tmp= None
 	#pron.p.send('M105')
@@ -766,8 +766,10 @@ def do_monitor():
 			job_process = 'print'
 		else:
 			job_process = 'heating'
-			printer_tool1_temp = printer_tool1_temp + 4 #fake it untill you make it ;)
+			printer_tool1_temp = int((-5000/printer_tool1_temp)+199) #fake it untill you make it ;)
+			#^uses function with limit of 199 so it will never finish before the print starts
 	else:
+		print ('not printing')
 		job_progress = 100 #set equal to 100 when print has finished to end print
 		printer_inUse = False #manually set for Ult
 		job_process = 'idle'
