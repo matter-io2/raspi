@@ -625,8 +625,7 @@ def parseJSON(bodyString):
 	#new features
 	# - working timeout (cancelCmdTime set when cmd is called)
 	# - counter on no_job_id_count...
-	if job_cancel and int(job_num) >= 0:
-		print('cancel statement 1')#debug
+	if job_cancel:# and int(job_num) >= 0: #not getting past this if statement
 		dif = time()-cancelCmdTime
 		if int(dif) > 10: # timeout... not sure if it's working
 			rint('cancel statement 2')#debug
