@@ -588,13 +588,7 @@ def parseJSON(bodyString):
 		if bodyDict['job_id'] == job_id:
 		# job_ids match!
 			print 'DEBUG: job_id MATCH'
-			if bodyDict.has_key('job_cancelCmd'):
-				print ('arg 1 is true')
-			if bodyDict['job_cancelCmd'] == True :
-				print ('arg 2 is true')
-			if printer_inUse:
-				print ('arg 3 is true')
-			if bodyDict.has_key('job_cancelCmd') and bodyDict['job_cancelCmd'] == True and printer_inUse:#problem is in here
+			if bodyDict.has_key('job_cancelCmd') and bodyDict['job_cancelCmd'] == True and printer_inUse:#problem with printer_inUse
 				print '\n\nAttempting cancel for current job via job_cancelCmd \n\n'
 				logger.warning('Cancel Job - command from server for job_id:%s job_num:%s',str(job_id),str(job_num))
 				job_cancel = True
@@ -647,6 +641,7 @@ def parseJSON(bodyString):
 			pron.do_move("z 200")
 			pron.do_settemp("0")
 			printer_inUse = False #manually set for Ult
+			print('False in cancel')#TEST
 #end of cancel cmd call
 
 			job_num = -1 # important to say new job has not yet been added 
@@ -781,6 +776,7 @@ def do_monitor():
 		# 	job_progress=100# sometimes stops early
 	else:
 		printer_inUse = False #manually set for Ult
+		print('False in do_monitor')#TEST
 		job_process = 'idle'
 
 
