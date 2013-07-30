@@ -606,6 +606,7 @@ def parseJSON(bodyString):
 						#delete current job
 						job_cancel = True
 			job_id = bodyDict['job_id']
+			job_num = job_id
 			job_process = 'idle'
 			job_progress = 0
 			job_conclusion = '' #defaults to '' when job has not concluded (used above)
@@ -625,7 +626,7 @@ def parseJSON(bodyString):
 	#new features
 	# - working timeout (cancelCmdTime set when cmd is called)
 	# - counter on no_job_id_count...
-	if job_cancel:# and int(job_num) >= 0: #not getting past this if statement
+	if job_cancel: and int(job_num) >= 0: #not getting past this if statement
 		print('cancel statement 1')#debug
 		dif = time()-cancelCmdTime
 		if int(dif) > 10: # timeout... not sure if it's working
