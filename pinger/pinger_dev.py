@@ -633,7 +633,7 @@ def parseJSON(bodyString):
 			port = '/dev/ttyACM0'
 			pron.do_pause(port)
 			pron.do_home("xye")
-			#pron.do_move("z 200") #out for debugging now (it's annoying)
+			pron.do_move("z 200") #moves z axis all the way down, its annoying
 			pron.do_settemp("0")
 			printer_inUse = False #manually set for Ult
 #end of cancel cmd call
@@ -682,12 +682,12 @@ def printFile(fileName):
 			if line.find("Skeinforge") > 0:
 				slicer = "skeinforge"
 	#print file in printer.py
-#DREW_DONE Ultimaker print 
+#DREW_DONE Ultimaker print
 	filename = '../Printrun/Small_buddha.gcode' #set filepath for testing until config loads
 	gcode = [i.strip() for i in open(filename)]#sends gcode line by line
 	gcode = gcoder.GCode(gcode)
 	###########################^this should probably be done server side
-	###########^website shows printer offline during this
+	###########^website shows printer offline during this (b/c of timeout?)
 	pron.p.startprint(gcode) #calls method in printcore through pronsole only takes arrays
 	printer_inUse = True #manually set for Ult
 	logger.info('print started - %s ',str(fileName))
@@ -770,7 +770,6 @@ def do_monitor():
 			job_progress=100
 			job_conclusion = 'ENDED'
 	else:
-		print ('not printing')
 		printer_inUse = False #manually set for Ult
 		job_process = 'idle'
 		temp_curve = 0
