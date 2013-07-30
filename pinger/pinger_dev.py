@@ -753,6 +753,7 @@ def do_monitor():
 	#needed? or does pron just have it b/c it loops the monitor
 	line=pron.p._readline()
 	print ('M105: '+str(line)) #debugging
+	#TRY THE GETTEMP METHOD?
 	#split_line = line.split()
 	#printer_tool1_temp=str(split_line[1])[2:len(split_time[1])]
 	#^still need to parse consistently
@@ -762,7 +763,7 @@ def do_monitor():
 		prgs = int(prgs*10)/10.0 #limit precision
 		#prev_msg = str(progress) + "%"
 		#prog=prev_msg.ljust(0) #"0" used to be prev_msg_len from control2.py
-		job_progress = prgs
+		job_progress = int(prgs)
 		printer_inUse = True #manually set for Ult
 		if job_progress>=1.0:
 			job_process = 'print'
