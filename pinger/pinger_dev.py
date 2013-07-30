@@ -626,8 +626,10 @@ def parseJSON(bodyString):
 	# - working timeout (cancelCmdTime set when cmd is called)
 	# - counter on no_job_id_count...
 	if job_cancel and int(job_num) >= 0:
+		print('cancel statement 1')#debug
 		dif = time()-cancelCmdTime
 		if int(dif) > 10: # timeout... not sure if it's working
+			rint('cancel statement 2')#debug
 			logger.warning('bodyDict on cancel = %s'+str(bodyDict))
 #DREW_DONE Ultimaker cancel cmd
 			port = '/dev/ttyACM0'
@@ -752,27 +754,23 @@ def do_monitor():
 	#right code but doesn't send back consistant shit
 	tmp= None
 	#pron.p.send('M105')
-	#^is this blocking?
-	#monitor in pronsole has  a "sleep(interval)"
-	#needed? or does pron just have it b/c it loops the monitor
-	#line=pron.p._readline()
-	#print ('M105: '+str(line)) #debugging
-	#TRY THE GETTEMP METHOD?
-	#split_line = line.split()
-	#printer_tool1_temp=str(split_line[1])[2:len(split_time[1])]
-	#^still need to parse consistently
-	#can get tool2 and bed temp here
+	#send command blocks and stops sending of g-code
+	#aka can't use^ to get temperature
 	if pron.p.printing:
-		prgs = 100*float(pron.p.queueindex)/len(pron.p.mainqueue)
-		prgs = int(prgs*10)/10.0 #limit precision
-		#prev_msg = str(progress) + "%"
-		#prog=prev_msg.ljust(0) #"0" used to be prev_msg_len from control2.py
-		job_progress = int(prgs)
+		if job_progress<100:
+			prgs = 100*float(pron.p.queueindex)/len(pron.p.mainqueue)
+			prgs = int(prgs*10)/10.0 #limit precision
+			#prev_msg = str(progress) + "%"
+			#prog=prev_msg.ljust(0) #"0" used to be prev_msg_len from control2.py
+			job_progress = int(prgs)
 		printer_inUse = True #manually set for Ult
 		if job_progress>=1.0:
 			job_process = 'print'
 		else:
 			job_process = 'heating'
+			printer_tool1_temp = printer_tool1_temp + 4 #fake it untill you make it ;)
+		if job_ progress>=99:
+			job_progress=100# sometimes stops early
 	else:
 		printer_inUse = False #manually set for Ult
 		job_process = 'idle'
