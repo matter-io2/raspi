@@ -630,6 +630,9 @@ def parseJSON(bodyString):
 		if int(dif) > 10: # timeout... not sure if it's working
 			logger.warning('bodyDict on cancel = %s'+str(bodyDict))
 #DREW_DONE Ultimaker cancel cmd
+			port = '/dev/ttyACM0'
+			baud = '115200'
+			pron.p.connect(port, baud)#try connecting first
 			pron.do_pause(port)
 			pron.do_home("xye")
 			pron.do_move("z 200")
@@ -748,11 +751,12 @@ def do_monitor():
 	global job_progress
 	#right code but doesn't send back consistant shit
 	tmp= None
-	pron.p.send('M105')
+	#pron.p.send('M105')
+	#^is this blocking?
 	#monitor in pronsole has  a "sleep(interval)"
 	#needed? or does pron just have it b/c it loops the monitor
-	line=pron.p._readline()
-	print ('M105: '+str(line)) #debugging
+	#line=pron.p._readline()
+	#print ('M105: '+str(line)) #debugging
 	#TRY THE GETTEMP METHOD?
 	#split_line = line.split()
 	#printer_tool1_temp=str(split_line[1])[2:len(split_time[1])]
