@@ -767,9 +767,8 @@ def do_monitor():
 		else:
 			job_process = 'heating'
 			printer_tool1_temp = printer_tool1_temp + 4 #fake it untill you make it ;)
-		# if job_progress >= 99:
-		# 	job_progress=100# sometimes stops early
 	else:
+		job_progress = 100 #set equal to 100 when print has finished to end print
 		printer_inUse = False #manually set for Ult
 		job_process = 'idle'
 
