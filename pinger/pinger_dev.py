@@ -49,7 +49,7 @@ git_commit=''
 
 #comment to attempt update -1
 debug_internet=False
-debug_server_response= True
+debug_server_response= False
 debug_printer_socket=False
 debug_printer_client_socket=False
 debug_webcam=False
@@ -143,9 +143,6 @@ def mainBrain():
 		req_type='printer'
 		if pron.p.printing:#while printing
 			do_monitor()#update job % and temp
-	print 'x: '+str(temp_curve)#debug
-	print 'temp: '+str(printer_tool1_temp)
-
 	#3) PING SERVER... once ip_address saving is consistent add - if ip_address!=''
 	#	ping server with printer or pi info
 	print '\n----SERVER mediation----(debug=',debug_server_response,')\n'
@@ -751,7 +748,7 @@ class BeginningPrinter(Protocol):
 			print reason.printTraceback()
 #DREW_DONE Returns 2 lines upon request 1) needs to be parsed for temp 2) print %
 def do_monitor():
-	global job_progress, printer_tool1_temp, printer_inUse, job_process, temp_curve
+	global job_progress, printer_tool1_temp, printer_inUse, job_process, temp_curve, job_conclusion
 	#right code but doesn't send back consistant shit
 	tmp= None
 	#pron.p.send('M105')
