@@ -1,3 +1,9 @@
+###################################################
+###################################################
+######			Author: Drew Beller			#######
+######	Based on pinger.py from Matter.io	#######
+###################################################
+###################################################
 from cookielib import CookieJar
 from twisted.internet import reactor,task,endpoints
 from twisted.web.client import Agent, CookieAgent, ResponseDone
