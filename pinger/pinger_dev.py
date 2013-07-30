@@ -89,6 +89,7 @@ job_started = False
 job_fail_msg = '' #currently not getting fail messages from ultimaker
 ip_address = ''
 
+temp_curve= 0 #for fake heating
 
 #---main brain services---
 #1) moderate wifi connection
@@ -748,7 +749,7 @@ class BeginningPrinter(Protocol):
 			print reason.printTraceback()
 #DREW_DONE Returns 2 lines upon request 1) needs to be parsed for temp 2) print %
 def do_monitor():
-	global job_progress, printer_tool1_temp, printer_inUse, job_process
+	global job_progress, printer_tool1_temp, printer_inUse, job_process, temp_curve
 	#right code but doesn't send back consistant shit
 	tmp= None
 	#pron.p.send('M105')
@@ -766,13 +767,13 @@ def do_monitor():
 			job_process = 'print'
 		else:
 			job_process = 'heating'
-			printer_tool1_temp = int((-5000/printer_tool1_temp)+199) #fake it untill you make it ;)
-			#^uses function with limit of 199 so it will never finish before the print starts
+			temp_curve = temp_curve+1
+			printer_tool1_temp = int(200*(temp_curve/100)**(1/3.0)) #fake it untill you make it ;)
 	else:
-		print ('not printing')
-		job_progress = 100 #set equal to 100 when print has finished to end print
+		print ('not printing') #not getting here
 		printer_inUse = False #manually set for Ult
 		job_process = 'idle'
+		temp_curve = 0
 
 
 # def makeCmdlineReq(cmd,params = {}):
