@@ -143,6 +143,8 @@ def mainBrain():
 		req_type='printer'
 		if pron.p.printing:#while printing
 			do_monitor()#update job % and temp
+	print 'x: '+temp_curve#debug
+	print 'temp: '+printer_tool1_temp
 
 	#3) PING SERVER... once ip_address saving is consistent add - if ip_address!=''
 	#	ping server with printer or pi info
@@ -771,6 +773,7 @@ def do_monitor():
 			printer_tool1_temp = int(200*((temp_curve/100)**(1/3.0))) #fake it untill you make it ;)
 		if job_progress>=99: #doesn't always hit 100
 			job_progress=100
+			job_conclusion = 'ENDED'
 	else:
 		print ('not printing') #not getting here
 		printer_inUse = False #manually set for Ult
