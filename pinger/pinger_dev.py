@@ -755,12 +755,11 @@ def do_monitor():
 	#send command blocks and stops sending of g-code
 	#aka can't use^ to get temperature
 	if pron.p.printing:
-		if job_progress<100:
-			prgs = 100*float(pron.p.queueindex)/len(pron.p.mainqueue)
-			prgs = int(prgs*10)/10.0 #limit precision
-			#prev_msg = str(progress) + "%"
-			#prog=prev_msg.ljust(0) #"0" used to be prev_msg_len from control2.py
-			job_progress = int(prgs)
+		prgs = 100*float(pron.p.queueindex)/len(pron.p.mainqueue)
+		prgs = int(prgs*10)/10.0 #limit precision
+		#prev_msg = str(progress) + "%"
+		#prog=prev_msg.ljust(0) #"0" used to be prev_msg_len from control2.py
+		job_progress = int(prgs)
 		printer_inUse = True #manually set for Ult
 		if job_progress>=1.0:
 			job_process = 'print'
@@ -772,7 +771,6 @@ def do_monitor():
 			job_progress=100
 			job_conclusion = 'ENDED'
 	else:
-		print ('not printing') #not getting here
 		printer_inUse = False #manually set for Ult
 		job_process = 'idle'
 		temp_curve = 0
