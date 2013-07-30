@@ -588,7 +588,13 @@ def parseJSON(bodyString):
 		if bodyDict['job_id'] == job_id:
 		# job_ids match!
 			print 'DEBUG: job_id MATCH'
-			if bodyDict.has_key('job_cancelCmd') and bodyDict['job_cancelCmd'] == True and printer_inUse:
+			if bodyDict.has_key('job_cancelCmd'):
+				print ('arg 1 is true')
+			if bodyDict['job_cancelCmd'] == True :
+				print ('arg 2 is true')
+			if printer_inUse:
+				print ('arg 3 is true')
+			if bodyDict.has_key('job_cancelCmd') and bodyDict['job_cancelCmd'] == True and printer_inUse:#problem is in here
 				print '\n\nAttempting cancel for current job via job_cancelCmd \n\n'
 				logger.warning('Cancel Job - command from server for job_id:%s job_num:%s',str(job_id),str(job_num))
 				job_cancel = True
@@ -626,7 +632,7 @@ def parseJSON(bodyString):
 	#new features
 	# - working timeout (cancelCmdTime set when cmd is called)
 	# - counter on no_job_id_count...
-	if job_cancel: # and int(job_num) >= 0: #not getting past this if statement
+	if job_cancel and int(job_num) >= 0: #not getting past this if statement
 		print('cancel statement 1')#debug
 		dif = time()-cancelCmdTime
 		if int(dif) > 10: # timeout... not sure if it's working
