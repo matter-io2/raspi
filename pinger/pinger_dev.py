@@ -631,9 +631,9 @@ def parseJSON(bodyString):
 			rint('cancel statement 2')#debug
 			logger.warning('bodyDict on cancel = %s'+str(bodyDict))
 #DREW_DONE Ultimaker cancel cmd
-			port = '/dev/ttyACM0'
-			baud = '115200'
-			pron.p.connect(port, baud)#try connecting first
+			# port = '/dev/ttyACM0'
+			# baud = '115200'
+			# pron.p.connect(port, baud)#try connecting first
 			pron.do_pause(port)
 			pron.do_home("xye")
 			pron.do_move("z 200")
