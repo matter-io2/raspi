@@ -765,7 +765,8 @@ def do_monitor():
 		else:
 			job_process = 'heating'
 			temp_curve = temp_curve+1
-			printer_tool1_temp = int(200*((temp_curve/100.0)**(1/3.0))) #fake it untill you make it ;)
+			printer_tool1_temp = int((-500/(temp_curve+(500/229)))+229)#fake it untill you make it ;)
+			#^function to show time with limit of 229 (never break the GUI)
 		if job_progress>=99: #doesn't always hit 100
 			job_progress=100
 			job_conclusion = 'ENDED'
