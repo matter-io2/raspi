@@ -627,21 +627,16 @@ def parseJSON(bodyString):
 	# - working timeout (cancelCmdTime set when cmd is called)
 	# - counter on no_job_id_count...
 	if job_cancel: #not getting past this if statement
-		print('cancel statement 1')#debug
 		dif = time()-cancelCmdTime
 		if int(dif) > 10: # timeout... not sure if it's working
-			print('cancel statement 2')#debug
 			logger.warning('bodyDict on cancel = %s'+str(bodyDict))
 #DREW_DONE Ultimaker cancel cmd
-			# port = '/dev/ttyACM0'
-			# baud = '115200'
-			# pron.p.connect(port, baud)#try connecting first
+			port = '/dev/ttyACM0'
 			pron.do_pause(port)
 			pron.do_home("xye")
 			pron.do_move("z 200")
 			pron.do_settemp("0")
 			printer_inUse = False #manually set for Ult
-			print('False in cancel')#TEST
 #end of cancel cmd call
 
 			job_num = -1 # important to say new job has not yet been added 
