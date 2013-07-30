@@ -750,7 +750,7 @@ class BeginningPrinter(Protocol):
 			print reason.printTraceback()
 #DREW_DONE Returns 2 lines upon request 1) needs to be parsed for temp 2) print %
 def do_monitor():
-	global job_progress
+	global job_progress, printer_tool1_temp
 	#right code but doesn't send back consistant shit
 	tmp= None
 	#pron.p.send('M105')
