@@ -141,8 +141,7 @@ def mainBrain():
 	else:
 		print 'printer connected, id:',printer_printerId
 		req_type='printer'
-		if pron.p.printing:#while printing
-			do_monitor()#update job % and temp
+		do_monitor()#always monitor
 	#3) PING SERVER... once ip_address saving is consistent add - if ip_address!=''
 	#	ping server with printer or pi info
 	print '\n----SERVER mediation----(debug=',debug_server_response,')\n'
@@ -754,7 +753,7 @@ def do_monitor():
 	#pron.p.send('M105')
 	#send command blocks and stops sending of g-code
 	#aka can't use^ to get temperature
-	if pron.p.printing and printer_inUse==True:
+	if pron.p.printing:
 		prgs = 100*float(pron.p.queueindex)/len(pron.p.mainqueue)
 		prgs = int(prgs*10)/10.0 #limit precision
 		#prev_msg = str(progress) + "%"
@@ -770,9 +769,6 @@ def do_monitor():
 		if job_progress>=99: #doesn't always hit 100
 			job_progress=100
 			job_conclusion = 'ENDED'
-			printer_inUse = False #manually set for Ult
-			job_process = 'idle'
-			temp_curve = 0
 	else:
 		print ('not printing')
 		printer_inUse = False #manually set for Ult
