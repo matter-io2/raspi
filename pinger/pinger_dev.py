@@ -637,7 +637,7 @@ def parseJSON(bodyString):
 			port = '/dev/ttyACM0'
 			pron.do_pause(port)
 			pron.do_home("xye")
-			pron.do_move("z 200")
+			#pron.do_move("z 200") #out for debugging now (it's annoying)
 			pron.do_settemp("0")
 			printer_inUse = False #manually set for Ult
 #end of cancel cmd call
